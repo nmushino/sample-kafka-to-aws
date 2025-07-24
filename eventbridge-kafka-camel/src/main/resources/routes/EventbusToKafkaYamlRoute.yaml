@@ -1,0 +1,11 @@
+- route:
+    id: eventbridge-to-kafka
+    from:
+      uri: direct:eventbridge
+      steps:
+        - log:
+            message: "Received from EventBridge: ${body}"
+        - to:
+            uri: kafka:contract
+            parameters:
+              brokers: localhost:9092

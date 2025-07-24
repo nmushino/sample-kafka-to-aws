@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<title>契約一覧</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="container my-5">
+    <h1>契約一覧</h1>
+    <table class="table table-striped" id="contractTable">
+      <thead>
+        <tr>
+          <th>契約ID</th>
+          <th>顧客ID</th>
+          <th>商品ID</th>
+          <th>価格</th>
+          <th>数量</th>
+          <th>キャンセル</th>
+          <th>作成日</th>
+          <th>更新日</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- ここにJavaScriptで行を挿入 -->
+      </tbody>
+    </table>
+  </div>
+
+<script>
+  async function fetchContracts() {
+    try {
+      const res = await fetch('/contracts');
+      if (!res.ok) throw new Error('HTTP error ' + res.status);
+      const data = await res.json();
+      const tbody = document.querySelector('#contractTable tbody');
+      tbody.innerHTML = ''; // 既存行削除
+      data.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${c.contractId}</td>
+          <td>${c.customerId}</td>
+          <td>${c.productId}</td>
+          <td>¥${Number(c.price).toLocaleString()}</td>
+          <td>${c.quantity}</td>
+          <td>${c.cancelFlg === 'Y' ? 'はい' : 'いいえ'}</td>
+          <td>${new Date(c.createDate).toLocaleString('ja-JP')}</td>
+          <td>${new Date(c.updateDate).toLocaleString('ja-JP')}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    } catch(e) {
+      alert('契約の取得に失敗しました: ' + e.message);
+    }
+  }
+
+  fetchContracts();
+
+  // 必要に応じて定期更新したい場合
+  setInterval(fetchContracts, 5000); // 1分ごとに更新
+</script>
+
+</body>
+</html>

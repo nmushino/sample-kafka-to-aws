@@ -65,7 +65,7 @@ spec:
       databases: [systemdb]
   secrets:
     pguser: systemdb-pguser-secret
-  postgresql:
+  yepostgresql:
     pg_hba:
       - host all all 0.0.0.0/0 scram-sha-256
       - host all all ::0/0 scram-sha-256

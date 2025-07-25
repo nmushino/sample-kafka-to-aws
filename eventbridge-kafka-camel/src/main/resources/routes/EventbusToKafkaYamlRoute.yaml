@@ -7,5 +7,3 @@
             message: "Received from EventBridge: ${body}"
         - to:
             uri: kafka:contract
-            parameters:
-              brokers: localhost:9092

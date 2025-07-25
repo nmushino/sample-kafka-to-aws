@@ -49,6 +49,7 @@ deploy() {
     # 既存Appの削除
     oc delete all -l app=reactiveweb -n "$NAMESPACE"
     oc delete all -l app=postgressynccamel -n "$NAMESPACE"
+    oc delete all -l app=eventbridgesynccamel -n "$NAMESPACE"
     
     # Configmap/secret の追加
     oc apply -f provisioning/openshift/awseventbridge-configmap.yaml
@@ -70,7 +71,7 @@ deploy() {
     oc expose deployment reactiveweb --port=8080 --name=reactiveweb -n "$NAMESPACE"
     oc expose svc reactiveweb --name=reactiveweb -n "$NAMESPACE"
 
-    # postgressynccamel Quarkus App
+    # postgressynccamel Camel App
     oc new-app ubi8/openjdk-21~https://github.com/nmushino/sample-kafka-to-aws.git \
         --name=postgressynccamel \
         --context-dir=postgres-sync-camel \
@@ -78,6 +79,18 @@ deploy() {
         --strategy=source \
         -n "$NAMESPACE"
     oc apply -f provisioning/openshift/postgressynccamel-development.yaml -n "$NAMESPACE"
+
+    # eventbridgesynccamel Camel App
+    oc new-app ubi8/openjdk-21~https://github.com/nmushino/sample-kafka-to-aws.git \
+        --name=eventbridgesynccamel \
+        --context-dir=eventbridge-kafka-camel \
+        --allow-missing-images \
+        --strategy=source \
+        -n "$NAMESPACE"
+    oc apply -f provisioning/openshift/eventbridgesynccamel-development.yaml -n "$NAMESPACE"
+    oc expose deployment eventbridgesynccamel --port=8080 --name=eventbridgesynccamel -n "$NAMESPACE"
+    oc expose svc eventbridgesynccamel --name=eventbridgesynccamel -n "$NAMESPACE"
+
 
 
     # Homeoffice UI App

@@ -80,8 +80,8 @@ deploy() {
         --strategy=source \
         -n "$NAMESPACE"
     oc apply -f provisioning/openshift/reactiveweb-deployment.yaml -n "$NAMESPACE"
-    #oc expose deployment reactiveweb --port=8080 --name=reactiveweb -n "$NAMESPACE"
-    #oc expose svc reactiveweb --name=reactiveweb -n "$NAMESPACE"
+    oc expose deployment reactiveweb --port=8080 --name=reactiveweb -n "$NAMESPACE"
+    oc expose svc reactiveweb --name=reactiveweb -n "$NAMESPACE"
 
     # Homeoffice UI App
     #oc new-app ubi8/nodejs-20~https://github.com/nmushino/quarkusdroneshop-homeoffice-ui.git --name=homeoffice-ui --allow-missing-images --strategy=source -n "$NAMESPACE"

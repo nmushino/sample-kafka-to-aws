@@ -3,14 +3,8 @@
 # Script Name: postgres.sh
 # Description: This script is for connecting to PostgreSQL via Port-Fowad.
 # Author: Noriaki Mushino
-# Date Created: 2025-03-26
-# Last Modified: 2025-04-17
+# Last Modified: 2025-07-25
 # Version: 1.0
-#
-# Prerequisites:
-#   - OpenShift CLI (oc) is installed and configured
-#   - User is logged into OpenShift
-#
 # =============================================================================
 
 NAMESPACE="awseventbridge-demo"

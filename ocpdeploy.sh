@@ -3,22 +3,8 @@
 # Script Name: deploy.sh
 # Description: This script deploys the application to OpenShift and verifies the setup.
 # Author: Noriaki Mushino
-# Date Created: 2025-03-26
-# Last Modified: 2025-06-04
-# Version: 1.13
-#
-# Usage:
-#   ./deploy.sh setup           - To setup the environment.
-#   ./deploy.sh deploy          - To deploy the all application.
-#   ./deploy.sh openmetadata    - To deploy the openmetadata application.
-#   ./deploy.sh cleanup         - To delete the application.
-#
-# Prerequisites:
-#   - OpenShift CLI (oc) is installed and configured
-#   - figlet is installed and configured
-#   - User is logged into OpenShift
-#   - The Test was conducted on MacOS
-#
+# Last Modified: 2025-07-25
+# Version: 1.13#
 # =============================================================================
 
 NAMESPACE="awseventbridge-demo"

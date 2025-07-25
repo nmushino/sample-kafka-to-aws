@@ -4,7 +4,7 @@ SET search_path TO system;
 
 GRANT CREATE ON SCHEMA system TO systemadmin;
 
-CREATE TABLE system.contract (
+CREATE TABLE contract (
   contract_id UUID NOT NULL,
   customer_id UUID NOT NULL,
   product_id VARCHAR(30) NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE system.contract (
 
 
 
-INSERT INTO system.contract (contract_id, customer_id, product_id, price, quantity, cancel_flg, create_date, update_date) VALUES ('6622D936-DB52-4E78-B4B3-92FE1A2830F2', 'C6A66D01-EFDD-433B-9CC7-EEC0037B3017', 'PROD-489', 4013.78, 6, 0, '2024-11-14 18:31:37', '2025-07-22 18:31:37');
+INSERT INTO contract (contract_id, customer_id, product_id, price, quantity, cancel_flg, create_date, update_date) VALUES ('6622D936-DB52-4E78-B4B3-92FE1A2830F2', 'C6A66D01-EFDD-433B-9CC7-EEC0037B3017', 'PROD-489', 4013.78, 6, 0, '2024-11-14 18:31:37', '2025-07-22 18:31:37');
 INSERT INTO contract (contract_id, customer_id, product_id, price, quantity, cancel_flg, create_date, update_date) VALUES ('DB817911-1D9D-4069-B782-C6212033ECCB', '9E3696EC-98D0-48A6-8FAC-2BB820A13FEA', 'PROD-114', 6025.41, 8, 0, '2025-06-11 18:31:37', '2025-07-22 18:31:37');
 -- INSERT INTO contract (contract_id, customer_id, product_id, price, quantity, cancel_flg, create_date, update_date) VALUES ('CE664C67-FCFB-4D95-A999-596855366ECC', 'C36E2FE4-6C0C-4CE7-8784-052D2EE25E2B', 'PROD-190', 9716.96, 2, 0, '2025-05-25 18:31:37', '2025-07-22 18:31:37');
 -- INSERT INTO contract (contract_id, customer_id, product_id, price, quantity, cancel_flg, create_date, update_date) VALUES ('16E1894C-1DF9-4427-B7D6-CF66D8F58C99', '1A24D3C3-B1C9-4FA9-A3CE-942358978CD4', 'PROD-864', 8126.59, 10, 0, '2024-09-03 18:31:37', '2025-07-22 18:31:37');

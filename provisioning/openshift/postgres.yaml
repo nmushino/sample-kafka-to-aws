@@ -62,10 +62,14 @@ spec:
                   storage: 1Gi
   users:
     - name: systemadmin
-      databases: [systemdb]
-  secrets:
-    pguser: systemdb-pguser-secret
-  postgresql:
-    pg_hba.conf:
-      - host all all 0.0.0.0/0 trust
-      - host all all ::0/0 trust
+      databases:
+        - systemdb
+  patroni:
+    dynamicConfiguration:
+      postgresql:
+        pg_hba:
+          - host all all 0.0.0.0/0 trust
+          - host all all ::0/0 trust
+  proxy:
+    pgBouncer:
+      enabled: false

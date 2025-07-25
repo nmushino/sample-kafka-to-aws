@@ -69,6 +69,16 @@ deploy() {
     oc expose deployment reactiveweb --port=8080 --name=reactiveweb -n "$NAMESPACE"
     oc expose svc reactiveweb --name=reactiveweb -n "$NAMESPACE"
 
+    # postgressynccamel Quarkus App
+    oc new-app ubi8/openjdk-21~https://github.com/nmushino/sample-kafka-to-aws.git \
+        --name=postgressynccamel \
+        --context-dir=postgres-sync-camel \
+        --allow-missing-images \
+        --strategy=source \
+        -n "$NAMESPACE"
+    oc apply -f provisioning/openshift/postgressynccamel-deployment.yaml -n "$NAMESPACE"
+
+
     # Homeoffice UI App
     #oc new-app ubi8/nodejs-20~https://github.com/nmushino/quarkusdroneshop-homeoffice-ui.git --name=homeoffice-ui --allow-missing-images --strategy=source -n "$NAMESPACE"
     #oc expose deployment homeoffice-ui --port=8080 --name=homeoffice-ui -n "$NAMESPACE"

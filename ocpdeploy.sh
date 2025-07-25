@@ -59,29 +59,34 @@ deploy() {
 
     echo "デプロイ開始..."
 
+    oc new-project "$NAMESPACE"
     # 既存Appの削除
-    oc delete all -l app=web -n "$NAMESPACE"
-    oc delete all -l app=counter -n "$NAMESPACE"
-    oc delete all -l app=inventory -n "$NAMESPACE"
-    oc delete all -l app=QDCA10Pro -n "$NAMESPACE"
-    oc delete all -l app=QDCA10 -n "$NAMESPACE"
-    oc delete all -l app=homeoffice-backend -n "$NAMESPACE"
-    oc delete all -l app=homeoffice-ui -n "$NAMESPACE"
-    oc delete all -l app=customermocker -n "$NAMESPACE"
+    oc delete all -l app=reactiveweb -n "$NAMESPACE"
     
-    # Configmap の追加
-    oc apply -f openshift/awseventbridge-configmap.yaml
+    # Configmap/secret の追加
+    oc apply -f provisioning/openshift/awseventbridge-configmap.yaml
+    oc apply -f provisioning/openshift/awseventbridge-secrets.yaml
 
-    # awseventbridge Camel App
-    oc new-app ubi8/openjdk-21~https://github.com/nmushino/sample-kafka-to-aws.git --name=counter --allow-missing-images --strategy=source -n "$NAMESPACE"
-    oc apply -f openshift/awseventbridge-development.yaml -n "$NAMESPACE"
-    oc expose deployment web --port=8080 --name=quarkusdroneshop-web -n "$NAMESPACE"
-    oc expose svc quarkusdroneshop-web --name=quarkusdroneshop-web -n "$NAMESPACE"
+    # Postgres/kafka のセットアップ
+    oc apply -f provisioning/openshift/postgres.yaml
+    oc apply -f provisioning/openshift/kafka.yaml
+    oc apply -f provisioning/openshift/kafdrop.yaml
+
+    # reactiveweb Quarkus App
+    oc new-app ubi8/openjdk-21~https://github.com/nmushino/sample-kafka-to-aws.git \
+        --name=reactiveweb \
+        --context-dir=reactive-postgres-web \
+        --allow-missing-images \
+        --strategy=source \
+        -n "$NAMESPACE"
+    oc apply -f provisioning/openshift/reactiveweb-deployment.yaml -n "$NAMESPACE"
+    #oc expose deployment reactiveweb --port=8080 --name=reactiveweb -n "$NAMESPACE"
+    #oc expose svc reactiveweb --name=reactiveweb -n "$NAMESPACE"
 
     # Homeoffice UI App
-    oc new-app ubi8/nodejs-20~https://github.com/nmushino/quarkusdroneshop-homeoffice-ui.git --name=homeoffice-ui --allow-missing-images --strategy=source -n "$NAMESPACE"
-    oc expose deployment homeoffice-ui --port=8080 --name=homeoffice-ui -n "$NAMESPACE"
-    oc expose svc homeoffice-ui --name=homeoffice-ui -n "$NAMESPACE"
+    #oc new-app ubi8/nodejs-20~https://github.com/nmushino/quarkusdroneshop-homeoffice-ui.git --name=homeoffice-ui --allow-missing-images --strategy=source -n "$NAMESPACE"
+    #oc expose deployment homeoffice-ui --port=8080 --name=homeoffice-ui -n "$NAMESPACE"
+    #oc expose svc homeoffice-ui --name=homeoffice-ui -n "$NAMESPACE"
 
 }
 
@@ -90,8 +95,6 @@ cleanup() {
 
     oc delete subscription amq-streams --all -n "$NAMESPACE" --ignore-not-found=true
     oc delete subscription crunchy-postgres-operator --all -n "$NAMESPACE" --ignore-not-found=true
-    oc delete operator --all -n openshift-operators --ignore-not-found=true
-    oc delete operator --all -n "$NAMESPACE" --ignore-not-found=true
     oc delete all --all -n "$NAMESPACE" --ignore-not-found=true --force --grace-period=0
 
     read -p "本当にプロジェクトを削除してもよろしいですか？(yes/no): " DELETE_CONFREM

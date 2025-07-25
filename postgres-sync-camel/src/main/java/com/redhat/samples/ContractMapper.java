@@ -28,3 +28,19 @@ public class ContractMapper {
         exchange.getIn().setHeader("CamelJdbcParameters", params);
     }
 }
+
+
+/**
+
+{
+    "contract_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "customer_id": "11112222-3333-4444-5555-666677778888",
+    "product_id": "PROD-001",
+    "price": 1200.50,
+    "quantity": 3,
+    "cancel_flg": "N",
+    "create_date": "2025-06-11 18:31:37",
+    "update_date": "2025-06-11 18:31:37"
+  }
+
+ */

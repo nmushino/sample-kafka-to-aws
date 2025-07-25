@@ -3,6 +3,8 @@
     from:
       uri: kafka:contract
       steps:
+        - log:
+            message: "Received contract message: ${body}"
         - unmarshal:
             json:
               library: jackson
@@ -11,6 +13,8 @@
             method: mapToJdbcParams
         - set-body:
             constant: >
-              INSERT INTO contract (contract_id, customer_id, product_id, price,
-              quantity, cancel_flg, create_date, update_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+              INSERT INTO contract (
+                contract_id, customer_id, product_id, price,
+                quantity, cancel_flg, create_date, update_date
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         - to: jdbc:dataSource?useHeadersAsParameters=true

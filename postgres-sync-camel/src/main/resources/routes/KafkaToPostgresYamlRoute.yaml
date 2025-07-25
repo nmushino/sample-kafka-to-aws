@@ -11,6 +11,6 @@
             method: mapToJdbcParams
         - set-body:
             constant: >
-              INSERT INTO contract (contract_id, customer_id, product_id, price,
+              INSERT INTO system.contract (contract_id, customer_id, product_id, price,
               quantity, cancel_flg, create_date, update_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         - to: jdbc:dataSource?useHeadersAsParameters=true

@@ -40,5 +40,5 @@ public class ContractMapper {
     "cancel_flg": "N",
     "create_date": "2025-06-11 18:31:37",
     "update_date": "2025-06-11 18:31:37"
-  }
+}
  */

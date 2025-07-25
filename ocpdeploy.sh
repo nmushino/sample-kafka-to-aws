@@ -48,6 +48,7 @@ deploy() {
     oc new-project "$NAMESPACE"
     # 既存Appの削除
     oc delete all -l app=reactiveweb -n "$NAMESPACE"
+    oc delete all -l app=postgressynccamel -n "$NAMESPACE"
     
     # Configmap/secret の追加
     oc apply -f provisioning/openshift/awseventbridge-configmap.yaml
@@ -76,7 +77,7 @@ deploy() {
         --allow-missing-images \
         --strategy=source \
         -n "$NAMESPACE"
-    oc apply -f provisioning/openshift/postgressynccamel-deployment.yaml -n "$NAMESPACE"
+    oc apply -f provisioning/openshift/postgressynccamel-development.yaml -n "$NAMESPACE"
 
 
     # Homeoffice UI App

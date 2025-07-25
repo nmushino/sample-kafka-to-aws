@@ -29,9 +29,8 @@ public class ContractMapper {
     }
 }
 
-
 /**
-
+これは、サンプルデータになります
 {
     "contract_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
     "customer_id": "11112222-3333-4444-5555-666677778888",
@@ -42,5 +41,4 @@ public class ContractMapper {
     "create_date": "2025-06-11 18:31:37",
     "update_date": "2025-06-11 18:31:37"
   }
-
  */

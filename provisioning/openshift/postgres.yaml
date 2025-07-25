@@ -66,6 +66,6 @@ spec:
   secrets:
     pguser: systemdb-pguser-secret
   postgresql:
-    pg_hba:
+    pg_hba.conf:
       - host all all 0.0.0.0/0 trust
       - host all all ::0/0 trust

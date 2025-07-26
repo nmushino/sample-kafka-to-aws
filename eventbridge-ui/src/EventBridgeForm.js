@@ -13,13 +13,27 @@ function getFormattedDate() {
   return `${yyyy}-${MM}-${dd} ${hh}:${mm}:${ss}`;
 }
 
+function getRandomPrice() {
+  const price = (Math.random() * (1000 - 1) + 1).toFixed(2);
+  return price;
+}
+
+function getRandomProductId() {
+  const randomNumber = Math.floor(1000 + Math.random() * 9000); // 1000〜9999 のランダムな4桁
+  return `PROD-${randomNumber}`;
+}
+
+function getRandomQuantity() {
+  return Math.floor(Math.random() * 100) + 1; // 1〜100
+}
+
 export default function EventBridgeForm() {
   const [formData, setFormData] = useState({
     contractId: uuidv4(),
     customerId: uuidv4(),
-    productId: 'PROD-0001',
-    price: '0.00',
-    quantity: '1',
+    productId: getRandomProductId(),
+    price: getRandomPrice(),
+    quantity: getRandomQuantity().toString(), 
     create_date: getFormattedDate(),
     update_date: getFormattedDate(),
   });

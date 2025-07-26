@@ -17,15 +17,30 @@ spec:
       containers:
         - name: postgressynccamel
           env:
-            - name: PGSQL_USER
+            - name: REACT_APP_AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: systemdb-pguser-systemadmin
-                  key: user
-            - name: PGSQL_PASS
+                  name: awseventbridge-secrets
+                  key: REACT_APP_AWS_ACCESS_KEY_ID
+            - name: REACT_APP_AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: systemdb-pguser-systemadmin
-                  key: password
+                  name: awseventbridge-secrets
+                  key: REACT_APP_AWS_SECRET_ACCESS_KEY
+            - name: REACT_APP_AWS_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: awseventbridge-secrets
+                  key: REACT_APP_AWS_REGION
+            - name: REACT_APP_EVENT_BUS_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: awseventbridge-secrets
+                  key: REACT_APP_EVENT_BUS_NAM
+            - name: REACT_APP_IDENTITY_POOL_ID
+              valueFrom:
+                secretKeyRef:
+                  name: awseventbridge-secrets
+                  key: REACT_APP_IDENTITY_POOL_ID
             - name: QUARKUS_PROFILE
               value: "prod"

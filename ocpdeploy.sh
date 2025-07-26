@@ -50,6 +50,7 @@ deploy() {
     oc delete all -l app=reactiveweb -n "$NAMESPACE"
     oc delete all -l app=postgressynccamel -n "$NAMESPACE"
     oc delete all -l app=eventbridgesynccamel -n "$NAMESPACE"
+    oc delete all -l app=eventbridgeui -n "$NAMESPACE"
     
     # Configmap/secret の追加
     oc apply -f provisioning/openshift/awseventbridge-configmap.yaml
@@ -93,10 +94,16 @@ deploy() {
     oc patch route eventbridgesynccamel -n "$NAMESPACE" -p '{"spec":{"tls":{"termination":"edge"}}}'
 
 
-    # Homeoffice UI App
-    #oc new-app ubi8/nodejs-20~https://github.com/nmushino/quarkusdroneshop-homeoffice-ui.git --name=homeoffice-ui --allow-missing-images --strategy=source -n "$NAMESPACE"
-    #oc expose deployment homeoffice-ui --port=8080 --name=homeoffice-ui -n "$NAMESPACE"
-    #oc expose svc homeoffice-ui --name=homeoffice-ui -n "$NAMESPACE"
+    # eventbridgeui App
+    oc new-app ubi8/nodejs-20~https://github.com/nmushino/sample-kafka-to-aws.git \
+        --name=reactiveweb \
+        --context-dir=eventbridge-ui \
+        --allow-missing-images \
+        --strategy=source \
+        -n "$NAMESPACE"
+    oc apply -f provisioning/openshift/eventbridgeui-deployment.yaml -n "$NAMESPACE"
+    oc expose deployment eventbridgeui --port=8080 --name=eventbridgeui -n "$NAMESPACE"
+    oc expose svc eventbridgeui --name=eventbridgeui -n "$NAMESPACE"
 
 }
 

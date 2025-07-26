@@ -17,6 +17,11 @@ const EVENT_BUS_NAME = window._env_?.REACT_APP_EVENT_BUS_NAME || process.env.REA
 const createEventBridgeClient = () => {
   if ((!ACCESS_KEY_ID || !SECRET_ACCESS_KEY) && !IDENTITY_POOL_ID) {
     throw new Error("AWS credentials or Cognito Identity Pool ID are not set");
+    console.error("Missing values:", {
+      ACCESS_KEY_ID,
+      SECRET_ACCESS_KEY,
+      IDENTITY_POOL_ID,
+    });
   }
   
   const client = new EventBridgeClient({

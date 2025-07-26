@@ -99,6 +99,7 @@ deploy() {
         --context-dir=eventbridge-ui \
         --allow-missing-images \
         --strategy=source \
+        --build-env-from=secret/eventbridgeui-env \
         -n "$NAMESPACE"
     oc apply -f provisioning/openshift/eventbridgeui-deployment.yaml -n "$NAMESPACE"
     oc expose deployment eventbridgeui --port=8080 --name=eventbridgeui -n "$NAMESPACE"

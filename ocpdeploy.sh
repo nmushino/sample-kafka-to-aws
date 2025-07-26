@@ -8,7 +8,7 @@
 # =============================================================================
 
 NAMESPACE="awseventbridge-demo"
-OPENMETADATASPACE="openmetadata"
+REGISTRY="image-registry.openshift-image-registry.svc:5000"
 DOMAIN_NAME=$(oc get ingresses.config.openshift.io cluster -o jsonpath='{.spec.domain}' | cut -d'.' -f2-)
 DOMAIN_TOKEN=$(oc whoami -t)
 ENV_FILE="source.env"
@@ -98,12 +98,20 @@ deploy() {
     #     -n "$NAMESPACE"
     # oc expose deployment eventbridgeui --port=8080 --name=eventbridgeui -n "$NAMESPACE"
     # oc expose svc eventbridgeui --name=eventbridgeui -n "$NAMESPACE"
-    cd eventbridge-ui
-    tar -czf eventbridgeui.tar.gz .
-    oc start-build eventbridgeui --from-archive=eventbridgeui.tar.gz -n "$NAMESPACE"
+
+    # Secretがあるため回避策
+    cd ./eventbridge-ui
+    podman buildx build --platform linux/amd64 -t eventbridgeui .
+    # Tag ローカルイメージ
+    podman tag eventbridgeui "$REGISTRY"/"$NAMESPACE"/eventbridgeui:latest
+
+    # Push to internal OpenShift registry
+    podman login -u $(oc whoami) -p $(oc whoami -t) --tls-verify=false "$REGISTRY"
+    oc project "$NAMESPACE"
+    podman push --tls-verify=false eventbridgeui:latest "$REGISTRY"/"$NAMESPACE"/eventbridgeui:latest
+    oc create deployment eventbridgeui --image="$REGISTRY"/"$NAMESPACE"/eventbridgeui:latest
     oc expose deployment eventbridgeui --port=8080 --name=eventbridgeui -n "$NAMESPACE"
     oc expose svc eventbridgeui --name=eventbridgeui -n "$NAMESPACE"
-
 }
 
 cleanup() {

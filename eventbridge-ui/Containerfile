@@ -1,0 +1,29 @@
+# Red Hat Universal Base Image with Node.js 18
+FROM registry.access.redhat.com/ubi9/nodejs-18
+
+# アプリケーションの作業ディレクトリを作成・指定
+WORKDIR /opt/app-root/src
+
+# root で権限を調整
+USER root
+
+# 所有者とアクセス権を調整（EACCESエラー対策）
+RUN chown -R 1001:0 /opt/app-root/src && chmod -R ug+rwX /opt/app-root/src
+
+# package.json と package-lock.json を先にコピー（キャッシュ活用）
+COPY package*.json ./
+
+# 依存関係をインストール
+RUN npm install
+
+# アプリの全コードをコピー
+COPY . .
+
+# ビルド（必要な場合）
+RUN npm run build
+
+# 実行時ユーザーを変更（OpenShift での実行安全性確保）
+USER 1001
+
+# アプリケーションの起動
+CMD ["npm", "start"]

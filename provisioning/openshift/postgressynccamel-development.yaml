@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgressynccamel
+  name: eventbridgeui
   namespace: awseventbridge-demo
   labels:
-    app: postgressynccamel
+    app: eventbridgeui
     environment: production
     category: awseventbridge
 spec:
@@ -12,35 +12,21 @@ spec:
   template:
     metadata:
       labels:
-        app: postgressynccamel
+        app: eventbridgeui
     spec:
       containers:
-        - name: postgressynccamel
+        - name: eventbridgeui
           env:
-            - name: REACT_APP_AWS_ACCESS_KEY_ID
+            - name: PGSQL_USER
               valueFrom:
                 secretKeyRef:
-                  name: awseventbridge-secrets
-                  key: REACT_APP_AWS_ACCESS_KEY_ID
-            - name: REACT_APP_AWS_SECRET_ACCESS_KEY
+                  name: systemdb-pguser-systemadmin
+                  key: user
+            - name: PGSQL_PASS
               valueFrom:
                 secretKeyRef:
-                  name: awseventbridge-secrets
-                  key: REACT_APP_AWS_SECRET_ACCESS_KEY
-            - name: REACT_APP_AWS_REGION
-              valueFrom:
-                secretKeyRef:
-                  name: awseventbridge-secrets
-                  key: REACT_APP_AWS_REGION
-            - name: REACT_APP_EVENT_BUS_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: awseventbridge-secrets
-                  key: REACT_APP_EVENT_BUS_NAM
-            - name: REACT_APP_IDENTITY_POOL_ID
-              valueFrom:
-                secretKeyRef:
-                  name: awseventbridge-secrets
-                  key: REACT_APP_IDENTITY_POOL_ID
+                  name: systemdb-pguser-systemadmin
+                  key: password
             - name: QUARKUS_PROFILE
               value: "prod"
+        

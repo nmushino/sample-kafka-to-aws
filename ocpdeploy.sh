@@ -96,7 +96,7 @@ deploy() {
 
     # eventbridgeui App
     oc new-app ubi8/nodejs-20~https://github.com/nmushino/sample-kafka-to-aws.git \
-        --name=reactiveweb \
+        --name=eventbridgeui \
         --context-dir=eventbridge-ui \
         --allow-missing-images \
         --strategy=source \

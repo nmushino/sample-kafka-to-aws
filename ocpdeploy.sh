@@ -90,12 +90,17 @@ deploy() {
     oc patch route eventbridgesynccamel -n "$NAMESPACE" -p '{"spec":{"tls":{"termination":"edge"}}}'
 
     # eventbridgeui App
-    oc new-app ubi8/nodejs-20~https://github.com/nmushino/sample-kafka-to-aws.git \
-        --name=eventbridgeui \
-        --context-dir=eventbridge-ui \
-        --allow-missing-images \
-        --strategy=source \
-        -n "$NAMESPACE"
+    # oc new-app ubi8/nodejs-20~https://github.com/nmushino/sample-kafka-to-aws.git \
+    #     --name=eventbridgeui \
+    #     --context-dir=eventbridge-ui \
+    #     --allow-missing-images \
+    #     --strategy=source \
+    #     -n "$NAMESPACE"
+    # oc expose deployment eventbridgeui --port=8080 --name=eventbridgeui -n "$NAMESPACE"
+    # oc expose svc eventbridgeui --name=eventbridgeui -n "$NAMESPACE"
+    cd eventbridge-ui
+    tar -czf eventbridgeui.tar.gz .
+    oc start-build eventbridgeui --from-archive=eventbridgeui.tar.gz -n "$NAMESPACE"
     oc expose deployment eventbridgeui --port=8080 --name=eventbridgeui -n "$NAMESPACE"
     oc expose svc eventbridgeui --name=eventbridgeui -n "$NAMESPACE"
 

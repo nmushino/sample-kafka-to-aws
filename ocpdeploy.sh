@@ -90,7 +90,7 @@ deploy() {
     oc apply -f provisioning/openshift/eventbridgesynccamel-development.yaml -n "$NAMESPACE"
     oc expose deployment eventbridgesynccamel --port=8080 --name=eventbridgesynccamel -n "$NAMESPACE"
     oc expose svc eventbridgesynccamel --name=eventbridgesynccamel -n "$NAMESPACE"
-
+    oc patch route eventbridgesynccamel -n "$NAMESPACE" -p '{"spec":{"tls":{"termination":"edge"}}}'
 
 
     # Homeoffice UI App

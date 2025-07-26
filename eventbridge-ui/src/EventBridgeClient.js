@@ -5,7 +5,7 @@ import awsconfig from "./aws-exports";
 
 Amplify.configure(awsconfig);
 
-// EventBridge クライアント
+// クライアント
 const client = new EventBridgeClient({
   region: process.env.REACT_APP_AWS_REGION,
   credentials: process.env.REACT_APP_AWS_ACCESS_KEY_ID

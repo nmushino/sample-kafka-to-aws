@@ -43,19 +43,14 @@ export default function EventBridgeForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log('[DEBUG] handleSubmit triggered');
-    console.log('[DEBUG] formData to be sent:', formData);
-
     try {
       const result = await sendEvent('MyDetailType', formData);
-      console.log('[DEBUG] Event sent successfully:', result);
-      alert('Event sent successfully: ' + JSON.stringify(result));
       setMessage('Event sent successfully!');
       setIsError(false);
 
       setTimeout(() => {
         window.location.reload();
-      }, 300000); // 3秒後にリロード
+      }, 3000); // 3秒後にリロード
 
     } catch (err) {
       console.error('[DEBUG] Failed to send event:', err);

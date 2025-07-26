@@ -1,9 +1,9 @@
 package com.redhat.examples;
 
 import org.apache.camel.Exchange;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
+import org.jboss.logging.Logger;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -15,18 +15,21 @@ import java.util.UUID;
 @Named("contractMapper")
 public class ContractMapper {
 
+    private static final Logger LOGGER = Logger.getLogger(ContractMapper.class);
+
     public void mapToJdbcParams(Exchange exchange) {
         Map<String, Object> body = exchange.getIn().getBody(Map.class);
-        
-        // "detail" を取り出す
+        LOGGER.infof("ContractMapper に受信したデータ: %s", body);
+
         Map<String, Object> detail = (Map<String, Object>) body.get("detail");
         if (detail == null) {
+            LOGGER.error("detail が存在しません");
             throw new IllegalArgumentException("detail が存在しません");
         }
 
-        // "data" を取り出す
         Map<String, Object> data = (Map<String, Object>) detail.get("data");
         if (data == null) {
+            LOGGER.error("detail.data が存在しません");
             throw new IllegalArgumentException("detail.data が存在しません");
         }
 
@@ -39,6 +42,8 @@ public class ContractMapper {
         params.put("6", 0); 
         params.put("7", Timestamp.valueOf((String) body.get("create_date")));
         params.put("8", Timestamp.valueOf((String) body.get("update_date")));
+
+        LOGGER.infof("JDBC パラメータ: %s", params);
 
         exchange.getIn().setHeader("CamelJdbcParameters", params);
     }

@@ -5,6 +5,7 @@ import org.apache.camel.Exchange;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,14 +31,14 @@ public class ContractMapper {
         }
 
         Map<String, Object> params = new HashMap<>();
-        params.put("1", UUID.fromString((String) data.get("contractId")));
-        params.put("2", UUID.fromString((String) data.get("customerId")));
-        params.put("3", data.get("productId"));
-        params.put("4", data.get("price"));
-        params.put("5", data.get("quantity"));
-        params.put("6", data.getOrDefault("cancel_flg", null)); // キーがなければ null
-        params.put("7", Timestamp.valueOf((String) data.get("create_date")));
-        params.put("8", Timestamp.valueOf((String) data.get("update_date")));
+        params.put("1", UUID.fromString((String) body.get("contractId")));
+        params.put("2", UUID.fromString((String) body.get("customerId")));
+        params.put("3", body.get("productId"));
+        params.put("4", new BigDecimal((String) body.get("price"))); 
+        params.put("5", Integer.valueOf((String) body.get("quantity"))); 
+        params.put("6", 0); 
+        params.put("7", Timestamp.valueOf((String) body.get("create_date")));
+        params.put("8", Timestamp.valueOf((String) body.get("update_date")));
 
         exchange.getIn().setHeader("CamelJdbcParameters", params);
     }

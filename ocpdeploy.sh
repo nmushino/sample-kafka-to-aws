@@ -96,8 +96,6 @@ deploy() {
         --allow-missing-images \
         --strategy=source \
         -n "$NAMESPACE"
-    oc set env bc/eventbridgeui --from=secret/awseventbridge-secrets -n $NAMESPACE
-    oc set env deployment/eventbridgeui --from=secret/awseventbridge-secrets -n "$NAMESPACE"
     oc expose deployment eventbridgeui --port=8080 --name=eventbridgeui -n "$NAMESPACE"
     oc expose svc eventbridgeui --name=eventbridgeui -n "$NAMESPACE"
 

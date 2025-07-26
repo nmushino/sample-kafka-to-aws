@@ -23,25 +23,23 @@ public class ContractMapper {
 
         Map<String, Object> detail = (Map<String, Object>) body.get("detail");
         if (detail == null) {
-            LOGGER.error("detail が存在しません");
             throw new IllegalArgumentException("detail が存在しません");
         }
 
         Map<String, Object> data = (Map<String, Object>) detail.get("data");
         if (data == null) {
-            LOGGER.error("detail.data が存在しません");
             throw new IllegalArgumentException("detail.data が存在しません");
         }
 
         Map<String, Object> params = new HashMap<>();
-        params.put("1", UUID.fromString((String) body.get("contractId")));
-        params.put("2", UUID.fromString((String) body.get("customerId")));
-        params.put("3", body.get("productId"));
-        params.put("4", new BigDecimal((String) body.get("price"))); 
-        params.put("5", Integer.valueOf((String) body.get("quantity"))); 
+        params.put("1", UUID.fromString((String) data.get("contractId")));
+        params.put("2", UUID.fromString((String) data.get("customerId")));
+        params.put("3", data.get("productId"));
+        params.put("4", new BigDecimal((String) data.get("price"))); 
+        params.put("5", Integer.valueOf((String) data.get("quantity"))); 
         params.put("6", 0); 
-        params.put("7", Timestamp.valueOf((String) body.get("create_date")));
-        params.put("8", Timestamp.valueOf((String) body.get("update_date")));
+        params.put("7", Timestamp.valueOf((String) data.get("create_date")));
+        params.put("8", Timestamp.valueOf((String) data.get("update_date")));
 
         LOGGER.infof("JDBC パラメータ: %s", params);
 

@@ -93,7 +93,6 @@ deploy() {
     oc expose svc eventbridgesynccamel --name=eventbridgesynccamel -n "$NAMESPACE"
     oc patch route eventbridgesynccamel -n "$NAMESPACE" -p '{"spec":{"tls":{"termination":"edge"}}}'
 
-
     # eventbridgeui App
     oc new-app ubi8/nodejs-20~https://github.com/nmushino/sample-kafka-to-aws.git \
         --name=eventbridgeui \

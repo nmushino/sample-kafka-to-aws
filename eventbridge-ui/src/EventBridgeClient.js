@@ -15,25 +15,22 @@ const EVENT_BUS_NAME = window._env_?.REACT_APP_EVENT_BUS_NAME || process.env.REA
 
 // クライアント生成は関数化して、毎回最新の環境変数で作成する形にするのがおすすめ
 const createEventBridgeClient = () => {
-  if (ACCESS_KEY_ID && SECRET_ACCESS_KEY) {
-    return new EventBridgeClient({
-      region: REGION,
-      credentials: {
-        accessKeyId: ACCESS_KEY_ID,
-        secretAccessKey: SECRET_ACCESS_KEY,
-      },
-    });
-  } else if (IDENTITY_POOL_ID) {
-    return new EventBridgeClient({
-      region: REGION,
-      credentials: fromCognitoIdentityPool({
-        clientConfig: { region: REGION },
-        identityPoolId: IDENTITY_POOL_ID,
-      }),
-    });
-  } else {
+  if ((!ACCESS_KEY_ID || !SECRET_ACCESS_KEY) && !IDENTITY_POOL_ID) {
     throw new Error("AWS credentials or Cognito Identity Pool ID are not set");
   }
+  
+  const client = new EventBridgeClient({
+    region: REGION,
+    credentials: ACCESS_KEY_ID
+      ? {
+          accessKeyId: ACCESS_KEY_ID,
+          secretAccessKey: SECRET_ACCESS_KEY,
+        }
+      : fromCognitoIdentityPool({
+          clientConfig: { region: REGION },
+          identityPoolId: IDENTITY_POOL_ID,
+        }),
+  });
 };
 
 // イベント送信関数

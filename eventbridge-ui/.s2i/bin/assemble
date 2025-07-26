@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# S2I の元のビルド処理を実行
+/opt/app-root/src/s2i/assemble
+
+# env.js を生成
+cat <<EOF > /opt/app-root/src/public/env.js
+window._env_ = {
+  REACT_APP_AWS_REGION: "${REACT_APP_AWS_REGION}",
+  REACT_APP_EVENT_BUS_NAME: "${REACT_APP_EVENT_BUS_NAME}",
+  REACT_APP_AWS_ACCESS_KEY_ID: "${REACT_APP_AWS_ACCESS_KEY_ID}",
+  REACT_APP_AWS_SECRET_ACCESS_KEY: "${REACT_APP_AWS_SECRET_ACCESS_KEY}"
+};
+EOF

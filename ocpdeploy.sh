@@ -37,10 +37,6 @@ if [ "$DOMAIN_CONFREM" != "yes" ]; then
     exit 1
 fi
 
-# source.env ファイルのCLUSTER_DOMAIN_NAMEとTOKEN を更新する
-sed -i '' "s/^CLUSTER_DOMAIN_NAME=.*$/CLUSTER_DOMAIN_NAME=$DOMAIN_NAME/" $ENV_FILE
-sed -i '' "s/^TOKEN=.*$/TOKEN=$DOMAIN_TOKEN/" $ENV_FILE
-
 deploy() {
 
     echo "デプロイ開始..."
@@ -99,9 +95,9 @@ deploy() {
         --context-dir=eventbridge-ui \
         --allow-missing-images \
         --strategy=source \
-        --build-env-from=secret/eventbridgeui-env \
         -n "$NAMESPACE"
-    oc apply -f provisioning/openshift/eventbridgeui-deployment.yaml -n "$NAMESPACE"
+    oc set env bc/eventbridgeui --from=secret/awseventbridge-secrets -n $NAMESPACE
+    oc set env deployment/eventbridgeui --from=secret/awseventbridge-secrets -n "$NAMESPACE"
     oc expose deployment eventbridgeui --port=8080 --name=eventbridgeui -n "$NAMESPACE"
     oc expose svc eventbridgeui --name=eventbridgeui -n "$NAMESPACE"
 

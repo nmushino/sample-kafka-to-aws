@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: eventbridgeui
+  name: postgressynccamel
   namespace: awseventbridge-demo
   labels:
-    app: eventbridgeui
+    app: postgressynccamel
     environment: production
     category: awseventbridge
 spec:
@@ -12,10 +12,10 @@ spec:
   template:
     metadata:
       labels:
-        app: eventbridgeui
+        app: postgressynccamel
     spec:
       containers:
-        - name: eventbridgeui
+        - name: postgressynccamel
           env:
             - name: PGSQL_USER
               valueFrom:

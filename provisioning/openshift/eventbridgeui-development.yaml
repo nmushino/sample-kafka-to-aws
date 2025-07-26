@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgressynccamel
+  name: eventbridgeui
   namespace: awseventbridge-demo
   labels:
-    app: postgressynccamel
+    app: eventbridgeui
     environment: production
     category: awseventbridge
 spec:
@@ -12,10 +12,10 @@ spec:
   template:
     metadata:
       labels:
-        app: postgressynccamel
+        app: eventbridgeui
     spec:
       containers:
-        - name: postgressynccamel
+        - name: eventbridgeui
           env:
             - name: REACT_APP_AWS_ACCESS_KEY_ID
               valueFrom:

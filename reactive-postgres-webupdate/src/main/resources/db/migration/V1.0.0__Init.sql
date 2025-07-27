@@ -1,8 +1,8 @@
-DROP TABLE IF EXISTS system.contract;
+#DROP TABLE IF EXISTS system.contract;
 
 SET search_path TO system;
 
-GRANT CREATE ON SCHEMA system TO systemadmin;
+#GRANT CREATE ON SCHEMA system TO systemadmin;
 
 CREATE TABLE contract (
   contract_id UUID NOT NULL,
@@ -15,21 +15,6 @@ CREATE TABLE contract (
   update_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (contract_id)
 );
-quit;
-
-psql -h localhost -p 5432 -U postgres
-ALTER ROLE systemadmin WITH REPLICATION;
-quit;
-
-psql -h localhost -p 5432 -U systemadmin -d systemdb
-SET search_path TO system;
-
-GRANT SELECT ON ALL TABLES IN SCHEMA system TO systemadmin
-GRANT CONNECT ON DATABASE systemdb TO systemadmin;
-GRANT USAGE ON SCHEMA system TO systemadmin;
-ALTER PUBLICATION debezium_publication ADD TABLE system.contract;
-GRANT SELECT ON system.contract TO systemadmin;
-GRANT USAGE ON SCHEMA system TO systemadmin;
 
 
 -- INSERT INTO contract (contract_id, customer_id, product_id, price, quantity, cancel_flg, create_date, update_date) VALUES ('6622D936-DB52-4E78-B4B3-92FE1A2830F2', 'C6A66D01-EFDD-433B-9CC7-EEC0037B3017', 'PROD-489', 4013.78, 6, 0, '2024-11-14 18:31:37', '2025-07-22 18:31:37');

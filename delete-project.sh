@@ -3,14 +3,8 @@
 # Script Name: delete-project.sh
 # Description: This script is for deleteing to Project.
 # Author: Noriaki Mushino
-# Date Created: 2025-05-25
-# Last Modified: 2025-07-19
+# Last Modified: 2025-07-26
 # Version: 1.0
-#
-# Prerequisites:
-#   - OpenShift CLI (oc) is installed and configured
-#   - User is logged into OpenShift
-#
 # =============================================================================
 # 注意: 対象プロジェクトを消していいか再度確認ください。
 # 注意: 対象のプロジェクトがどうしても削除できない場合に利用してください

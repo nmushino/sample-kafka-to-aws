@@ -1,8 +1,8 @@
-#DROP TABLE IF EXISTS system.contract;
+DROP TABLE IF EXISTS system.contract;
 
 SET search_path TO system;
 
-#GRANT CREATE ON SCHEMA system TO systemadmin;
+GRANT CREATE ON SCHEMA system TO systemadmin;
 
 CREATE TABLE contract (
   contract_id UUID NOT NULL,

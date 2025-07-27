@@ -3,14 +3,8 @@
 # Script Name: kafka-delete-topic.sh
 # Description: This script is for deleteing to Kafka Topic.
 # Author: Noriaki Mushino
-# Date Created: 2025-03-26
-# Last Modified: 2025-04-17
+# Last Modified: 2025-07-26
 # Version: 1.0
-#
-# Prerequisites:
-#   - OpenShift CLI (oc) is installed and configured
-#   - User is logged into OpenShift
-#
 # =============================================================================
 # 注意: ログイン後、対象ドメインのすべてのTopicを消します。
 

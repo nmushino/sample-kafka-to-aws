@@ -154,7 +154,14 @@ deploy() {
             oc expose deployment reactivewebupdate --port=8080 --name=reactivewebupdate -n "$NAMESPACE_DZ"
             oc expose svc reactivewebupdate --name=reactivewebupdate -n "$NAMESPACE_DZ"
             
-            
+            # kafkasynccamel Camel App
+            oc new-app ubi8/openjdk-21~https://github.com/nmushino/sample-kafka-to-aws.git \
+                --name=kafkasynccamel \
+                --context-dir=kafka-sync-camel \
+                --allow-missing-images \
+                --strategy=source \
+                -n "$NAMESPACE_DZ"
+            oc apply -f provisioning/openshift/kafkasynccamel-development.yaml -n "$NAMESPACE_DZ"
             
             
             
@@ -174,7 +181,7 @@ deploy() {
     esac
 }
 
-ebcleanup() {
+cleanup() {
     echo "クリーンナップ開始..."
 
     echo "削除するプロジェクトを選択してください："
@@ -229,3 +236,23 @@ case "$1" in
         exit 1
         ;;
 esac
+
+
+# {
+#   "name": "debezium-connector",
+#   "config": {
+#     "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+#     "database.hostname": "systemdb-primary",
+#     "database.port": "5432",
+#     "database.user": "systemadmin",
+#     "database.password": "postgres",
+#     "database.dbname": "systemdb",
+#     "database.server.name": "server",
+#     "plugin.name": "pgoutput",
+#     "slot.name": "debezium_slot",
+#     "publication.name": "debezium_publication",
+#     "tombstones.on.delete": "false",
+#     "include.schema.changes": "false",
+#     "topic.prefix": "system"
+#   }
+# }

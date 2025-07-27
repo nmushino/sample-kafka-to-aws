@@ -1,0 +1,16 @@
+- route:
+    id: route-2937
+    from:
+      uri: kafka:system.system.contract
+      steps:
+        - unmarshal:
+            json:
+              library: jackson
+        - bean:
+            ref: contractMapper
+            method: mapToJdbcParams
+        - set-body:
+            constant: >
+              INSERT INTO system.contract (contract_id, customer_id, product_id, price,
+              quantity, cancel_flg, create_date, update_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        - to: jdbc:dataSource?useHeadersAsParameters=true

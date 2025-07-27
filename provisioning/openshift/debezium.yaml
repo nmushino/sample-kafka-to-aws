@@ -1,0 +1,42 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnect
+metadata:
+  name: debezium-connect-cluster
+  namespace: debezium-demo
+  labels:
+    strimzi.io/cluster: debezum-cluster
+spec:
+  bootstrapServers: 'debezium-cluster-kafka-bootstrap:9092'
+  replicas: 1
+  image: 'quay.io/nmushino/kafka-connect-debezium:latest'
+  config:
+    group.id: connect-cluster
+    config.storage.topic: connect-configs
+    offset.storage.topic: connect-offsets
+    status.storage.topic: connect-status
+    key.converter: org.apache.kafka.connect.json.JsonConverter
+    key.converter.schemas.enable: false
+    value.converter: org.apache.kafka.connect.json.JsonConverter
+    value.converter.schemas.enable: false
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: postgres-connector
+  namespace: debezium-demo
+  labels:
+    strimzi.io/cluster: debezium-connect-cluster
+spec:
+  class: io.debezium.connector.postgresql.PostgresConnector
+  tasksMax: 1
+  config:
+    database.hostname: systemdb-primary
+    database.port: 5432
+    database.user: systemadmin
+    database.password: postgres
+    database.dbname: systemdb
+    database.server.name: server
+    plugin.name: pgoutput
+    slot.name: debezium_slot
+    publication.name: debezium_publication
+    table.include.list: system.contract

@@ -36,6 +36,11 @@ spec:
         resources:
           requests:
             storage: 1Gi
+      postgresql:
+        config:
+          wal_level: "logical"
+          max_replication_slots: "10"
+          max_wal_senders: "10"
   backups:
     pgbackrest:
       image: registry.connect.redhat.com/crunchydata/crunchy-pgbackrest@sha256:ccd5291f05c5d47345f32033840c4830e10a0e507c8e57f59b0271caccc37841

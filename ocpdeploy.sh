@@ -129,11 +129,19 @@ deploy() {
             oc apply -f provisioning/openshift/sample-configmap.yaml -n "$NAMESPACE_SM"
             oc apply -f provisioning/openshift/sample-secrets.yaml -n "$NAMESPACE_SM"
 
+
+            # Debezium Connector の作成(カスタム)
+            cd provisioning/podman
+            podman build --platform=linux/amd64 -t quay.io/nmushino/kafka-connect-debezium:latest .
+            podman push quay.io/nmushino/kafka-connect-debezium:latest
+            cd ../..
+            
             # Postgres/kafka のセットアップ
             oc apply -f provisioning/openshift/postgres2.yaml -n "$NAMESPACE_DZ"
             oc apply -f provisioning/openshift/kafka2.yaml -n "$NAMESPACE_DZ"
             oc apply -f provisioning/openshift/kafdrop2.yaml -n "$NAMESPACE_DZ"
             oc apply -f provisioning/openshift/postgres3.yaml -n "$NAMESPACE_SM"
+            oc apply -f provisioning/openshift/debezium.yaml -n "$NAMESPACE_DZ"
 
             # reactivewebupdate Quarkus App
             oc new-app ubi8/openjdk-21~https://github.com/nmushino/sample-kafka-to-aws.git \
@@ -145,12 +153,6 @@ deploy() {
             oc apply -f provisioning/openshift/reactivewebupdate-deployment.yaml -n "$NAMESPACE_DZ"
             oc expose deployment reactivewebupdate --port=8080 --name=reactivewebupdate -n "$NAMESPACE_DZ"
             oc expose svc reactivewebupdate --name=reactivewebupdate -n "$NAMESPACE_DZ"
-            
-            
-            
-            
-            
-            
             
             
             

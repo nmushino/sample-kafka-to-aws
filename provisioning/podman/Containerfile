@@ -1,0 +1,20 @@
+FROM registry.redhat.io/amq-streams/kafka-39-rhel9@sha256:818446e9a1b90acdb273f8bfcd1bc01ba9920a06bbf67b94504f4bcf8302f445
+USER root
+
+# プラグイン配置用ディレクトリ作成
+RUN mkdir -p /opt/kafka/plugins/debezium
+
+# Debezium Postgres コネクタの tar.gz を取得して展開
+ADD https://repo1.maven.org/maven2/io/debezium/debezium-connector-postgres/3.2.0.Final/debezium-connector-postgres-3.2.0.Final-plugin.tar.gz /tmp/
+RUN tar -xzf /tmp/debezium-connector-postgres-3.2.0.Final-plugin.tar.gz -C /opt/kafka/plugins/debezium
+
+# Kafka Connect の設定ファイルをイメージにコピー
+# ここでローカルの kafka-connect.properties をイメージ内に配置（例として /opt/kafka/config 配下）
+COPY kafka-connect.properties /opt/kafka/custom-config/kafka-connect.properties
+RUN chmod 775 /opt/kafka/custom-config/kafka-connect.properties
+
+# 実行ユーザを戻す
+USER 1001
+
+# 起動コマンドをオーバーライドするならコメント解除（任意）
+#CMD ["/opt/kafka/bin/connect-distributed.sh", "/opt/kafka/custom-config/kafka-connect.properties"]

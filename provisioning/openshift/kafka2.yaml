@@ -80,7 +80,7 @@ spec:
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaTopic
 metadata:
-  name: contract
+  name: response
   labels:
     strimzi.io/cluster: debezium-cluster
 spec:

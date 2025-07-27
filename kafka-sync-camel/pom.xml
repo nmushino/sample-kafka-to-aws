@@ -86,7 +86,11 @@
           <groupId>org.apache.camel.quarkus</groupId>
           <artifactId>camel-quarkus-bean</artifactId>
         </dependency>
-        <!-- Camel JDBC -->
+        <dependency>
+            <groupId>org.apache.camel.quarkus</groupId>
+            <artifactId>camel-quarkus-http</artifactId>
+            <version>3.20.1</version>
+        </dependency>
         <dependency>
           <groupId>org.apache.camel.quarkus</groupId>
           <artifactId>camel-quarkus-jdbc</artifactId>
@@ -95,8 +99,6 @@
           <groupId>org.apache.camel.quarkus</groupId>
           <artifactId>camel-quarkus-sql</artifactId>
         </dependency>
-
-        <!-- Quarkus PostgreSQL JDBC driver -->
         <dependency>
           <groupId>io.quarkus</groupId>
           <artifactId>quarkus-jdbc-postgresql</artifactId>

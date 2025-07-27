@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgressynccamel
-  namespace: awseventbridge-demo
+  namespace: debezium-demo
   labels:
     app: postgressynccamel
     environment: production
-    category: awseventbridge
+    category: debezium
 spec:
   replicas: 1
   template:

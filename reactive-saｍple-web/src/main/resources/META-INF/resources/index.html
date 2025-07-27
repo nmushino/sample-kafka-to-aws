@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Contracts</title>
+</head>
+<body>
+  <h1>Contracts</h1>
+  <ul id="contracts"></ul>
+
+  <script>
+    async function fetchContracts() {
+      const response = await fetch('/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: `
+            query {
+              contracts {
+                id
+                productId
+                customerId
+                price
+              }
+            }
+          `
+        })
+      });
+      const result = await response.json();
+      const list = document.getElementById('contracts');
+      list.innerHTML = '';
+      result.data.contracts.forEach(c => {
+        const li = document.createElement('li');
+        li.textContent = `${c.productId} - ${c.price}円`;
+        list.appendChild(li);
+      });
+    }
+
+    fetchContracts();
+  </script>
+</body>
+</html>

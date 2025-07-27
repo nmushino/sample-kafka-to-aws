@@ -15,6 +15,14 @@ CREATE TABLE contract (
   update_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (contract_id)
 );
+quit;
+
+psql -h localhost -p 5432 -U postgres
+ALTER ROLE systemadmin WITH REPLICATION;
+quit;
+
+psql -h localhost -p 5432 -U systemadmin -d systemdb
+SET search_path TO system;
 
 GRANT SELECT ON ALL TABLES IN SCHEMA system TO systemadmin
 GRANT CONNECT ON DATABASE systemdb TO systemadmin;

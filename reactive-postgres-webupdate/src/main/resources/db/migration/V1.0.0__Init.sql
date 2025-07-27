@@ -16,6 +16,13 @@ CREATE TABLE contract (
   PRIMARY KEY (contract_id)
 );
 
+GRANT SELECT ON ALL TABLES IN SCHEMA system TO systemadmin
+GRANT CONNECT ON DATABASE systemdb TO systemadmin;
+GRANT USAGE ON SCHEMA system TO systemadmin;
+ALTER PUBLICATION debezium_publication ADD TABLE system.contract;
+GRANT SELECT ON system.contract TO systemadmin;
+GRANT USAGE ON SCHEMA system TO systemadmin;
+
 
 -- INSERT INTO contract (contract_id, customer_id, product_id, price, quantity, cancel_flg, create_date, update_date) VALUES ('6622D936-DB52-4E78-B4B3-92FE1A2830F2', 'C6A66D01-EFDD-433B-9CC7-EEC0037B3017', 'PROD-489', 4013.78, 6, 0, '2024-11-14 18:31:37', '2025-07-22 18:31:37');
 -- INSERT INTO contract (contract_id, customer_id, product_id, price, quantity, cancel_flg, create_date, update_date) VALUES ('DB817911-1D9D-4069-B782-C6212033ECCB', '9E3696EC-98D0-48A6-8FAC-2BB820A13FEA', 'PROD-114', 6025.41, 8, 0, '2025-06-11 18:31:37', '2025-07-22 18:31:37');

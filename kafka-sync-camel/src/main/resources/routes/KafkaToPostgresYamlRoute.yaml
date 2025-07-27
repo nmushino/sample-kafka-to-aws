@@ -41,4 +41,4 @@
             message: "GraphQL Request Body: ${body}"
             loggingLevel: DEBUG
 
-        - to: http://reactivesample-sample-demo.apps.tggus-demo2.j526.p1.openshiftapps.com/createContract
+        - to: http://reactivesample-sample-demo.apps.tggus-demo2.j526.p1.openshiftapps.com/graphql

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>契約登録</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2em;
+    }
+    button {
+      background-color: #888888; /* グレー */
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    }
+    button:hover {
+      background-color: #666666;
+    }
+    /* 送信データ表示用プレ表示枠 */
+    #output {
+      margin-top: 1.5em;
+      padding: 12px 16px;
+      background-color: white; /* 背景は白のまま */
+      border: 2px solid #888888; /* グレーの枠線 */
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #222222;
+      min-height: 40px;
+      white-space: pre-wrap; /* 複数行折り返し */
+      word-break: break-word;
+      box-sizing: border-box;
+      font-family: Consolas, monospace;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>契約登録フォーム</h1>
+  <button type="button" onclick="registerContract()">契約を登録</button>
+
+  <h2>送信データ</h2>
+  <pre id="output">ここに結果が表示されます</pre>
+
+  <script>
+    function generateUUID() {
+      return crypto.randomUUID();
+    }
+
+    function generateProductId() {
+      const num = Math.floor(Math.random() * 10000);
+      return `RES-${String(num).padStart(4, '0')}`;
+    }
+
+    function generatePrice() {
+      return parseFloat((Math.random() * 1000).toFixed(2));
+    }
+
+    function generateQuantity() {
+      return Math.floor(Math.random() * 100) + 1;
+    }
+
+    function getFormattedISOString() {
+      return new Date().toISOString();
+    }
+
+    async function registerContract() {
+      console.log("registerContract() 実行開始");
+
+      // 画面表示用データ（id, name, statusを含む）
+      const contract = {
+        contractId: generateUUID(),
+        customerId: generateUUID(), 
+        productId: generateProductId(),
+        price: generatePrice(),
+        quantity: generateQuantity(),
+        cancelFlg: "0",
+        createDate: getFormattedISOString(),
+        updateDate: getFormattedISOString(),
+        id: generateUUID(),
+        name: "contract-" + Math.floor(Math.random() * 1000),
+        status: "success"
+      };
+
+      // DB登録用データのみ抽出
+      const body = {
+        contractId: contract.contractId,
+        customerId: contract.customerId,
+        productId: contract.productId,
+        price: contract.price,
+        quantity: contract.quantity,
+        cancelFlg: contract.cancelFlg,
+        createDate: contract.createDate,
+        updateDate: contract.updateDate
+      };
+
+      console.log("送信ボディ", JSON.stringify(body, null, 2));
+      // 画面表示
+      document.getElementById("output").textContent = JSON.stringify(contract, null, 2);
+
+      try {
+        const response = await fetch("/contracts", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(body)
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        let result = null;
+        const text = await response.text();  // まずテキストで取得
+        if (text) {
+            result = JSON.parse(text);
+        }
+        
+        console.log("登録成功:", result);
+      } catch (err) {
+        console.error("登録エラー:", err);
+        contract.status = "error";
+        document.getElementById("output").textContent = JSON.stringify(contract, null, 2);
+      }
+    }
+  </script>
+
+</body>
+</html>

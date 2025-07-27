@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS system.contract;
+-- DROP TABLE IF EXISTS system.contract;
 
 SET search_path TO system;
 

@@ -3,6 +3,8 @@ kind: KafkaConnect
 metadata:
   name: debezium-connect-cluster
   namespace: debezium-demo
+  annotations:
+    strimzi.io/use-connector-resources: "true"
   labels:
     strimzi.io/cluster: debezium-connect-cluster
 spec:
@@ -22,21 +24,21 @@ spec:
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaConnector
 metadata:
-  name: debezium-connect-cluster
+  name: debezium-connecter-cluster
   namespace: debezium-demo
   annotations:
     strimzi.io/use-connector-resources: "true"
   labels:
     strimzi.io/cluster: debezium-connect-cluster
 spec:
-  replicas: 1
-  bootstrapServers: 'debezium-cluster-kafka-bootstrap:9092'
-  image: debezium/connect:2.6
+  class: io.debezium.connector.postgresql.PostgresConnector
+  tasksMax: 1
   config:
+    connector.class: io.debezium.connector.postgresql.PostgresConnector
     config.storage.replication.factor: 1
     offset.storage.replication.factor: 1
     status.storage.replication.factor: 1
-    database.hostname: systemdb-primary
+    database.hostname: systemdb-ha
     database.port: 5432
     database.user: systemadmin
     database.password: postgres
@@ -45,4 +47,5 @@ spec:
     plugin.name: pgoutput
     slot.name: debezium_slot
     publication.name: debezium_publication
-    table.include.list: system.response
+    table.include.list: system.contract
+    topic.prefix: server

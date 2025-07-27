@@ -1,7 +1,7 @@
 - route:
     id: route-graphql-contract
     from:
-      uri: kafka:system.system.contract
+      uri: kafka:server.system.contract
       steps:
         - log:
             message: "Kafka Message Received: ${body}"

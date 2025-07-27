@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reactivesample
+  namespace: sample-demo
+  labels:
+    app: reactivesample
+    environment: production
+    category: sample
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: reactivesample
+    spec:
+      containers:
+        - name: reactivesample
+          env:
+            - name: PGSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: systemdb-pguser-systemadmin
+                  key: user
+            - name: PGSQL_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: systemdb-pguser-systemadmin
+                  key: password
+            - name: QUARKUS_PROFILE
+              value: "prod"

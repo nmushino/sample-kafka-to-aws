@@ -119,16 +119,14 @@ deploy() {
             oc new-project "$NAMESPACE_DZ"
             oc new-project "$NAMESPACE_SM"
             oc delete all -l app=reactivewebupdate -n "$NAMESPACE_DZ"
-            # oc delete all -l app=postgressynccamel -n "$NAMESPACE_DZ"
-            # oc delete all -l app=eventbridgesynccamel -n "$NAMESPACE_DZ"
-            # oc delete all -l app=eventbridgeui -n "$NAMESPACE_DZ"
+            oc delete all -l app=kafkasynccamel -n "$NAMESPACE_DZ"
+            oc delete all -l app=reactivesample -n "$NAMESPACE_SM"
             
             # Configmap/secret の追加
             oc apply -f provisioning/openshift/debezium-configmap.yaml -n "$NAMESPACE_DZ"
             oc apply -f provisioning/openshift/debezium-secrets.yaml -n "$NAMESPACE_DZ"
             oc apply -f provisioning/openshift/sample-configmap.yaml -n "$NAMESPACE_SM"
             oc apply -f provisioning/openshift/sample-secrets.yaml -n "$NAMESPACE_SM"
-
 
             # Debezium Connector の作成(カスタム)
             cd provisioning/podman
@@ -163,15 +161,16 @@ deploy() {
                 -n "$NAMESPACE_DZ"
             oc apply -f provisioning/openshift/kafkasynccamel-development.yaml -n "$NAMESPACE_DZ"
             
-            
-            
-            
-            
-            
-            
-            
-            
-            
+            #  reactivesample Quarkus App
+            oc new-app ubi8/openjdk-21~https://github.com/nmushino/sample-kafka-to-aws.git \
+                --name=reactivesample \
+                --context-dir=reactive-sample-web \
+                --allow-missing-images \
+                --strategy=source \
+                -n "$NAMESPACE_SM"
+            oc apply -f provisioning/openshift/reactivesample-deployment.yaml -n "$NAMESPACE_SM"
+            oc expose deployment reactivesample --port=8080 --name=reactivesample -n "$NAMESPACE_SM"
+            oc expose svc reactivesample --name=reactivesample -n "$NAMESPACE_SM"
             
             ;;
         *)

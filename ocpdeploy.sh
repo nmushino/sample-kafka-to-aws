@@ -7,7 +7,9 @@
 # Version: 1.13#
 # =============================================================================
 
-NAMESPACE="awseventbridge-demo"
+NAMESPACE_EB="awseventbridge-demo"
+NAMESPACE_DZ="debezium-demo"
+NAMESPACE_SM="sample-demo"
 REGISTRY="image-registry.openshift-image-registry.svc:5000"
 DOMAIN_NAME=$(oc get ingresses.config.openshift.io cluster -o jsonpath='{.spec.domain}' | cut -d'.' -f2-)
 DOMAIN_TOKEN=$(oc whoami -t)
@@ -41,94 +43,175 @@ deploy() {
 
     echo "デプロイ開始..."
 
-    oc new-project "$NAMESPACE"
-    # 既存Appの削除
-    oc delete all -l app=reactiveweb -n "$NAMESPACE"
-    oc delete all -l app=postgressynccamel -n "$NAMESPACE"
-    oc delete all -l app=eventbridgesynccamel -n "$NAMESPACE"
-    oc delete all -l app=eventbridgeui -n "$NAMESPACE"
-    
-    # Configmap/secret の追加
-    oc apply -f provisioning/openshift/awseventbridge-configmap.yaml
-    oc apply -f provisioning/openshift/awseventbridge-secrets.yaml
 
-    # Postgres/kafka のセットアップ
-    oc apply -f provisioning/openshift/postgres.yaml
-    oc apply -f provisioning/openshift/kafka.yaml
-    oc apply -f provisioning/openshift/kafdrop.yaml
+    echo "デプロイするプロジェクトを選択してください："
+    echo "1) awseventbridge-demo"
+    echo "2) debezium-demo & sample-demo"
+    read -p "番号を入力してください（1または2）: " SELECTION
 
-    # reactiveweb Quarkus App
-    oc new-app ubi8/openjdk-21~https://github.com/nmushino/sample-kafka-to-aws.git \
-        --name=reactiveweb \
-        --context-dir=reactive-postgres-web \
-        --allow-missing-images \
-        --strategy=source \
-        -n "$NAMESPACE"
-    oc apply -f provisioning/openshift/reactiveweb-deployment.yaml -n "$NAMESPACE"
-    oc expose deployment reactiveweb --port=8080 --name=reactiveweb -n "$NAMESPACE"
-    oc expose svc reactiveweb --name=reactiveweb -n "$NAMESPACE"
+    case "$SELECTION" in
+        1)
+            oc new-project "$NAMESPACE_EB"
 
-    # postgressynccamel Camel App
-    oc new-app ubi8/openjdk-21~https://github.com/nmushino/sample-kafka-to-aws.git \
-        --name=postgressynccamel \
-        --context-dir=postgres-sync-camel \
-        --allow-missing-images \
-        --strategy=source \
-        -n "$NAMESPACE"
-    oc apply -f provisioning/openshift/postgressynccamel-development.yaml -n "$NAMESPACE"
+            # 既存Appの削除
+            oc delete all -l app=reactiveweb -n "$NAMESPACE_EB"
+            oc delete all -l app=postgressynccamel -n "$NAMESPACE_EB"
+            oc delete all -l app=eventbridgesynccamel -n "$NAMESPACE_EB"
+            oc delete all -l app=eventbridgeui -n "$NAMESPACE_EB"
+            
+            # Configmap/secret の追加
+            oc apply -f provisioning/openshift/awseventbridge-configmap.yaml -n "$NAMESPACE_EB"
+            oc apply -f provisioning/openshift/awseventbridge-secrets.yaml -n "$NAMESPACE_EB"
 
-    # eventbridgesynccamel Camel App
-    oc new-app ubi8/openjdk-21~https://github.com/nmushino/sample-kafka-to-aws.git \
-        --name=eventbridgesynccamel \
-        --context-dir=eventbridge-kafka-camel \
-        --allow-missing-images \
-        --strategy=source \
-        -n "$NAMESPACE"
-    oc apply -f provisioning/openshift/eventbridgesynccamel-development.yaml -n "$NAMESPACE"
-    oc expose deployment eventbridgesynccamel --port=8080 --name=eventbridgesynccamel -n "$NAMESPACE"
-    oc expose svc eventbridgesynccamel --name=eventbridgesynccamel -n "$NAMESPACE"
-    oc patch route eventbridgesynccamel -n "$NAMESPACE" -p '{"spec":{"tls":{"termination":"edge"}}}'
+            # Postgres/kafka のセットアップ
+            oc apply -f provisioning/openshift/postgres1.yaml -n "$NAMESPACE_EB"
+            oc apply -f provisioning/openshift/kafka1.yaml -n "$NAMESPACE_EB"
+            oc apply -f provisioning/openshift/kafdrop1.yaml -n "$NAMESPACE_EB"
 
-    # eventbridgeui App
-    # oc new-app ubi8/nodejs-20~https://github.com/nmushino/sample-kafka-to-aws.git \
-    #     --name=eventbridgeui \
-    #     --context-dir=eventbridge-ui \
-    #     --allow-missing-images \
-    #     --strategy=source \
-    #     -n "$NAMESPACE"
-    # oc expose deployment eventbridgeui --port=8080 --name=eventbridgeui -n "$NAMESPACE"
-    # oc expose svc eventbridgeui --name=eventbridgeui -n "$NAMESPACE"
+            # reactiveweb Quarkus App
+            oc new-app ubi8/openjdk-21~https://github.com/nmushino/sample-kafka-to-aws.git \
+                --name=reactiveweb \
+                --context-dir=reactive-postgres-web \
+                --allow-missing-images \
+                --strategy=source \
+                -n "$NAMESPACE_EB"
+            oc apply -f provisioning/openshift/reactiveweb-deployment.yaml -n "$NAMESPACE_EB"
+            oc expose deployment reactiveweb --port=8080 --name=reactiveweb -n "$NAMESPACE_EB"
+            oc expose svc reactiveweb --name=reactiveweb -n "$NAMESPACE_EB"
 
-    # Secretがあるため回避策
-    cd ./eventbridge-ui
-    podman buildx build --platform linux/amd64 -t eventbridgeui .
-    # Tag ローカルイメージ
-    podman tag eventbridgeui "$REGISTRY"/"$NAMESPACE"/eventbridgeui:latest
+            # postgressynccamel Camel App
+            oc new-app ubi8/openjdk-21~https://github.com/nmushino/sample-kafka-to-aws.git \
+                --name=postgressynccamel \
+                --context-dir=postgres-sync-camel \
+                --allow-missing-images \
+                --strategy=source \
+                -n "$NAMESPACE_EB"
+            oc apply -f provisioning/openshift/postgressynccamel-development.yaml -n "$NAMESPACE_EB"
 
-    # Push to internal OpenShift registry
-    podman login -u $(oc whoami) -p $(oc whoami -t) --tls-verify=false "$REGISTRY"
-    oc project "$NAMESPACE"
-    podman push --tls-verify=false eventbridgeui:latest "$REGISTRY"/"$NAMESPACE"/eventbridgeui:latest
-    oc create deployment eventbridgeui --image="$REGISTRY"/"$NAMESPACE"/eventbridgeui:latest
-    oc expose deployment eventbridgeui --port=8080 --name=eventbridgeui -n "$NAMESPACE"
-    oc expose svc eventbridgeui --name=eventbridgeui -n "$NAMESPACE"
+            # eventbridgesynccamel Camel App
+            oc new-app ubi8/openjdk-21~https://github.com/nmushino/sample-kafka-to-aws.git \
+                --name=eventbridgesynccamel \
+                --context-dir=eventbridge-kafka-camel \
+                --allow-missing-images \
+                --strategy=source \
+                -n "$NAMESPACE_EB"
+            oc apply -f provisioning/openshift/eventbridgesynccamel-development.yaml -n "$NAMESPACE_EB"
+            oc expose deployment eventbridgesynccamel --port=8080 --name=eventbridgesynccamel -n "$NAMESPACE_EB"
+            oc expose svc eventbridgesynccamel --name=eventbridgesynccamel -n "$NAMESPACE_EB"
+            oc patch route eventbridgesynccamel -n "$NAMESPACE_EB" -p '{"spec":{"tls":{"termination":"edge"}}}'
+
+            # eventbridgeui
+            # Secretがあるため回避策
+            cd ./eventbridge-ui
+            podman buildx build --platform linux/amd64 -t eventbridgeui .
+            # Tag ローカルイメージ
+            podman tag eventbridgeui "$REGISTRY"/"$NAMESPACE_EB"/eventbridgeui:latest
+
+            # Push to internal OpenShift registry
+            podman login -u $(oc whoami) -p $(oc whoami -t) --tls-verify=false "$REGISTRY"
+            oc project "$NAMESPACE_EB"
+            podman push --tls-verify=false eventbridgeui:latest "$REGISTRY"/"$NAMESPACE_EB"/eventbridgeui:latest
+            oc create deployment eventbridgeui --image="$REGISTRY"/"$NAMESPACE_EB"/eventbridgeui:latest
+            oc expose deployment eventbridgeui --port=8080 --name=eventbridgeui -n "$NAMESPACE_EB"
+            oc expose svc eventbridgeui --name=eventbridgeui -n "$NAMESPACE_EB"
+            ;;
+        2)
+            oc new-project "$NAMESPACE_DZ"
+            oc new-project "$NAMESPACE_SM"
+            oc delete all -l app=reactivewebupdate -n "$NAMESPACE_DZ"
+            # oc delete all -l app=postgressynccamel -n "$NAMESPACE_DZ"
+            # oc delete all -l app=eventbridgesynccamel -n "$NAMESPACE_DZ"
+            # oc delete all -l app=eventbridgeui -n "$NAMESPACE_DZ"
+            
+            # Configmap/secret の追加
+            oc apply -f provisioning/openshift/debezium-configmap.yaml -n "$NAMESPACE_DZ"
+            oc apply -f provisioning/openshift/debezium-secrets.yaml -n "$NAMESPACE_DZ"
+            oc apply -f provisioning/openshift/sample-configmap.yaml -n "$NAMESPACE_SM"
+            oc apply -f provisioning/openshift/sample-secrets.yaml -n "$NAMESPACE_SM"
+
+            # Postgres/kafka のセットアップ
+            oc apply -f provisioning/openshift/postgres2.yaml -n "$NAMESPACE_DZ"
+            oc apply -f provisioning/openshift/kafka2.yaml -n "$NAMESPACE_DZ"
+            oc apply -f provisioning/openshift/kafdrop2.yaml -n "$NAMESPACE_DZ"
+            oc apply -f provisioning/openshift/postgres3.yaml -n "$NAMESPACE_SM"
+
+            # reactivewebupdate Quarkus App
+            oc new-app ubi8/openjdk-21~https://github.com/nmushino/sample-kafka-to-aws.git \
+                --name=reactivewebupdate \
+                --context-dir=reactive-postgres-webupdate \
+                --allow-missing-images \
+                --strategy=source \
+                -n "$NAMESPACE_DZ"
+            oc apply -f provisioning/openshift/reactivewebupdate-deployment.yaml -n "$NAMESPACE_DZ"
+            oc expose deployment reactivewebupdate --port=8080 --name=reactivewebupdate -n "$NAMESPACE_DZ"
+            oc expose svc reactivewebupdate --name=reactivewebupdate -n "$NAMESPACE_DZ"
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            ;;
+        *)
+            echo "無効な選択です。スクリプトを終了します。"
+            exit 1
+            ;;
+    esac
 }
 
-cleanup() {
+ebcleanup() {
     echo "クリーンナップ開始..."
 
-    oc delete subscription amq-streams --all -n "$NAMESPACE" --ignore-not-found=true
-    oc delete subscription crunchy-postgres-operator --all -n "$NAMESPACE" --ignore-not-found=true
-    oc delete all --all -n "$NAMESPACE" --ignore-not-found=true --force --grace-period=0
+    echo "削除するプロジェクトを選択してください："
+    echo "1) awseventbridge-demo"
+    echo "2) debezium-demo & sample-demo"
+    read -p "番号を入力してください（1または2）: " SELECTION
 
-    read -p "本当にプロジェクトを削除してもよろしいですか？(yes/no): " DELETE_CONFREM
-    if [ "$DELETE_CONFREM" == "yes" ]; then
-        # KafkaTopic リソースを強制削除
-        for topic in $(oc get kafkatopics.kafka.strimzi.io -n "$NAMESPACE" -o name); do
-            oc patch $topic -n "$NAMESPACE" --type=merge -p '{"metadata":{"finalizers":[]}}' 
-        done
-        oc delete project "$NAMESPACE" --force --grace-period=0
-    fi
+    case "$SELECTION" in
+        1)
+            oc delete subscription amq-streams --all -n "$NAMESPACE_EB" --ignore-not-found=true
+            oc delete subscription crunchy-postgres-operator --all -n "$NAMESPACE_EB" --ignore-not-found=true
+            oc delete all --all -n "$NAMESPACE_EB" --ignore-not-found=true --force --grace-period=0
+
+            read -p "本当にプロジェクトを削除してもよろしいですか？(yes/no): " DELETE_CONFREM
+            if [ "$DELETE_CONFREM" == "yes" ]; then
+                oc delete project "$NAMESPACE_EB" --force --grace-period=0
+            fi
+            ;;
+        2)
+            oc delete subscription amq-streams --all -n "$NAMESPACE_DZ" --ignore-not-found=true
+            oc delete subscription crunchy-postgres-operator --all -n "$NAMESPACE_DZ" --ignore-not-found=true
+            oc delete all --all -n "$NAMESPACE_DZ" --ignore-not-found=true --force --grace-period=0
+            oc delete subscription amq-streams --all -n "$NAMESPACE_SM" --ignore-not-found=true
+            oc delete subscription crunchy-postgres-operator --all -n "$NAMESPACE_SM" --ignore-not-found=true
+            oc delete all --all -n "$NAMESPACE_SM" --ignore-not-found=true --force --grace-period=0
+
+
+            read -p "本当にプロジェクトを削除してもよろしいですか？(yes/no): " DELETE_CONFREM
+            if [ "$DELETE_CONFREM" == "yes" ]; then
+                oc delete project "$NAMESPACE_DZ" --force --grace-period=0
+                oc delete project "$NAMESPACE_SM" --force --grace-period=0
+            fi
+            ;;
+        *)
+            echo "無効な選択です。スクリプトを終了します。"
+            exit 1
+            ;;
+    esac
+
 }
 
 case "$1" in

@@ -18,7 +18,7 @@ metadata:
   annotations:
     strimzi.io/kraft: enabled
     strimzi.io/node-pools: enabled
-  name: tg-cluster
+  name: eventbridge-cluster
   namespace: awseventbridge-demo
   labels:
     environment: dev
@@ -51,10 +51,10 @@ spec:
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaNodePool
 metadata:
-  name: tg-cluster-controllers
+  name: eventbridge-cluster-controllers
   namespace: awseventbridge-demo
   labels:
-    strimzi.io/cluster: tg-cluster
+    strimzi.io/cluster: eventbridge-cluster
 spec:
   replicas: 3
   roles:
@@ -67,10 +67,10 @@ spec:
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaNodePool
 metadata:
-  name: tg-cluster-brokers
+  name: eventbridge-cluster-brokers
   namespace: awseventbridge-demo
   labels:
-    strimzi.io/cluster: tg-cluster
+    strimzi.io/cluster: eventbridge-cluster
 spec:
   replicas: 3
   roles:
@@ -83,10 +83,10 @@ spec:
 # apiVersion: kafka.strimzi.io/v1beta2
 # kind: KafkaUser
 # metadata:
-#   name: tg-user
+#   name: eventbridge-user
 #   namespace: awseventbridge-demo
 #   labels:
-#     strimzi.io/cluster: tg-cluster
+#     strimzi.io/cluster: eventbridge-cluster
 # spec:
 #   authentication:
 #     type: scram-sha-512
@@ -96,7 +96,7 @@ kind: KafkaTopic
 metadata:
   name: contract
   labels:
-    strimzi.io/cluster: tg-cluster
+    strimzi.io/cluster: eventbridge-cluster
 spec:
   partitions: 10
   replicas: 3

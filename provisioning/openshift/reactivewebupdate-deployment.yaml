@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgressynccamel
-  namespace: awseventbridge-demo
+  name: reactivewebupdate
+  namespace: debezium-demo
   labels:
-    app: postgressynccamel
+    app: reactivewebupdate
     environment: production
-    category: awseventbridge
+    category: debezium
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: postgressynccamel
+        app: reactivewebupdate
     spec:
       containers:
-        - name: postgressynccamel
+        - name: reactivewebupdate
           env:
             - name: PGSQL_USER
               valueFrom:

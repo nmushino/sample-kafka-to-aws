@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: debezium-config
+  namespace: debezium-demo
+data:
+  QUARKUS_LOG_LEVEL: "INFO"
+  AWS_Default_Region: "us-east-2"

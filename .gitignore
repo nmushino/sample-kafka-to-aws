@@ -5,3 +5,5 @@ eventbridge-kafka-camel/src/main/resources/application.properties
 provisioning/openshift/awseventbridge-secrets.yaml
 eventbridge-kafka-camel/src/main/resources/application.properties
 eventbridge-kafka-camel/src/main/resources/application.properties
+provisioning/openshift/sample-secrets.yaml
+provisioning/openshift/debezium-secrets.yaml

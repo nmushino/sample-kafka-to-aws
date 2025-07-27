@@ -14,9 +14,9 @@ podman run -d --name kafka-demo --network kafka-demo \
 podman run -d \
   --name postgres-demo \
   --network kafka-demo \
-  -e POSTGRES_USER=systemaadmin \
+  -e POSTGRES_USER=systemadmin \
   -e POSTGRES_PASSWORD=postgres \
-  -e POSTGRES_DB=systema \
+  -e POSTGRES_DB=systemdb \
   -p 5432:5432 \
   postgres:latest
 
@@ -26,3 +26,13 @@ podman run -d --name kafdrop-demo \
   -e KAFKA_BROKERCONNECT=kafka-demo:9092 \
   -e JVM_OPTS="-Xms32M -Xmx64M" \
   obsidiandynamics/kafdrop
+
+podman run -d --name debezium-demo \
+  --network kafka-demo \
+  -p 8083:8083 \
+  -e BOOTSTRAP_SERVERS=kafka-demo:9092 \
+  -e GROUP_ID=1 \
+  -e CONFIG_STORAGE_TOPIC=my_connect_configs \
+  -e OFFSET_STORAGE_TOPIC=my_connect_offsets \
+  -e STATUS_STORAGE_TOPIC=my_connect_statuses \
+  quay.io/debezium/connect:latest

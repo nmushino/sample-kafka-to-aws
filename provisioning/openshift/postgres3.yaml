@@ -1,0 +1,62 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: pgo-pdb-access
+rules:
+  - apiGroups: ["policy"]
+    resources: ["poddisruptionbudgets"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: pgo-pdb-access-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: pgo-pdb-access
+subjects:
+  - kind: ServiceAccount
+    name: pgo
+    namespace: sample-demo
+---
+apiVersion: postgres-operator.crunchydata.com/v1beta1
+kind: PostgresCluster
+metadata:
+  name: systemdb
+  namespace: sample-demo
+spec:
+  postgresVersion: 17
+  image: registry.connect.redhat.com/crunchydata/crunchy-postgres@sha256:583a290f224701d5215d4e44e723cb6c542b1306ced074cd4d3bbe5810f22c0b
+  instances:
+    - name: systemdb
+      replicas: 1
+      dataVolumeClaimSpec:
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: 1Gi
+  backups:
+    pgbackrest:
+      image: registry.connect.redhat.com/crunchydata/crunchy-pgbackrest@sha256:ccd5291f05c5d47345f32033840c4830e10a0e507c8e57f59b0271caccc37841
+      repos:
+        - name: repo1
+          volume:
+            volumeClaimSpec:
+              accessModes: [ReadWriteOnce]
+              resources:
+                requests:
+                  storage: 1Gi
+  users:
+    - name: systemadmin
+      databases:
+        - systemdb
+  patroni:
+    dynamicConfiguration:
+      postgresql:
+        pg_hba:
+          - host all all 0.0.0.0/0 trust
+          - host all all ::0/0 trust
+  proxy:
+    pgBouncer:
+      enabled: false

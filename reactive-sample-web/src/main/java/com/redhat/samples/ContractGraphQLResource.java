@@ -8,6 +8,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
@@ -30,25 +31,39 @@ public class ContractGraphQLResource {
         return repository.listAll();
     }
 
-    @Mutation("createContract")
     @Transactional
-    public Contract createContract(@Name("contractInput") ContractInput input) {
+    @Mutation("createContract")
+    public Uni<Contract> createContract(@Name("contractInput") ContractInput input) {
         log.info("契約作成開始: {}", input);
-    
+
         Contract contract = new Contract();
-        contract.setContractId(input.contractId);
+        contract.setContractId(input.contractId != null ? input.contractId : UUID.randomUUID());
         contract.setCustomerId(input.customerId);
         contract.setProductId(input.productId);
         contract.setPrice(input.price);
         contract.setQuantity(input.quantity);
         contract.setCancelFlg(input.cancelFlg);
-        contract.setCreateDate(input.createDate);
-        contract.setUpdateDate(input.updateDate);
-    
-        repository.persist(contract);
-        return contract;
-    }
 
+        LocalDateTime createDate = null;
+        LocalDateTime updateDate = null;
+        try {
+            createDate = LocalDateTime.parse(input.createDate);
+        } catch (DateTimeParseException | NullPointerException e) {
+            createDate = LocalDateTime.now(); // フォーマット異常なら現在日時をセット
+        }
+        try {
+            updateDate = LocalDateTime.parse(input.updateDate);
+        } catch (DateTimeParseException | NullPointerException e) {
+            updateDate = LocalDateTime.now();
+        }
+
+        contract.setCreateDate(createDate);
+        contract.setUpdateDate(updateDate);
+
+        return repository.persist(contract)
+            .onFailure().invoke(ex -> log.error("契約作成中にエラー: {}", ex.getMessage()))
+            .replaceWith(contract);
+    }
     // DTO
     public static class ContractInput {
         public UUID contractId;
@@ -57,8 +72,8 @@ public class ContractGraphQLResource {
         public BigDecimal price;
         public int quantity;
         public String cancelFlg;
-        public LocalDateTime createDate;
-        public LocalDateTime updateDate;
+        public String createDate;
+        public String updateDate;
 
         @Override
         public String toString() {

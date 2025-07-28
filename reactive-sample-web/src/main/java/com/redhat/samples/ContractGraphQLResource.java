@@ -38,8 +38,10 @@ public class ContractGraphQLResource {
         contract.setPrice(input.price);
         contract.setQuantity(input.quantity);
         contract.setCancelFlg(input.cancelFlg);
-        contract.setCreateDate(LocalDateTime.now());
-        contract.setUpdateDate(LocalDateTime.now());
+        
+        LocalDateTime now = LocalDateTime.now();
+        contract.setCreateDate(now);
+        contract.setUpdateDate(now);
 
         return repository.persist(contract).replaceWith(contract);
     }
@@ -51,8 +53,6 @@ public class ContractGraphQLResource {
         public java.math.BigDecimal price;
         public int quantity;
         public String cancelFlg;
-        public LocalDateTime createDate;
-        public LocalDateTime updateDate;
 
         @Override
         public String toString() {
@@ -62,8 +62,6 @@ public class ContractGraphQLResource {
                     ", price=" + price +
                     ", quantity=" + quantity +
                     ", cancelFlg='" + cancelFlg + '\'' +
-                    ", createDate='" + createDate + '\'' +
-                    ", updateDate='" + updateDate + '\'' +
                     '}';
         }
     }

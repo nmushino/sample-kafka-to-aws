@@ -30,11 +30,11 @@ public class ContractGraphQLResource {
         return repository.listAll();
     }
 
-    @Transactional
     @Mutation("createContract")
-    public Uni<Contract> createContract(@Name("contractInput") ContractInput input) {
+    @Transactional
+    public Contract createContract(@Name("contractInput") ContractInput input) {
         log.info("契約作成開始: {}", input);
-
+    
         Contract contract = new Contract();
         contract.setContractId(input.contractId);
         contract.setCustomerId(input.customerId);
@@ -44,10 +44,9 @@ public class ContractGraphQLResource {
         contract.setCancelFlg(input.cancelFlg);
         contract.setCreateDate(input.createDate);
         contract.setUpdateDate(input.updateDate);
-
-        return repository.persist(contract)
-            .onFailure().invoke(ex -> log.error("契約作成中にエラー: {}", ex.getMessage()))
-            .replaceWith(contract);
+    
+        repository.persist(contract);
+        return contract;
     }
 
     // DTO

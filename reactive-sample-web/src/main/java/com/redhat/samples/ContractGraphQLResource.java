@@ -1,13 +1,14 @@
 package com.redhat.samples;
 
 import io.smallrye.mutiny.Uni;
+import io.smallrye.mutiny.infrastructure.Infrastructure;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.graphql.*;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -19,7 +20,6 @@ import org.slf4j.LoggerFactory;
 @GraphQLApi
 @ApplicationScoped
 public class ContractGraphQLResource {
-
     private static final Logger log = LoggerFactory.getLogger(ContractGraphQLResource.class);
 
     @Inject
@@ -27,43 +27,45 @@ public class ContractGraphQLResource {
 
     @Query("allContracts")
     public Uni<List<Contract>> getAllContracts() {
-        log.info("全契約を取得します");
-        return repository.listAll();
+        return repository.findAll().list(); // 修正: collect() → list()
     }
 
-    @Transactional
     @Mutation("createContract")
     public Uni<Contract> createContract(@Name("contractInput") ContractInput input) {
-        log.info("契約作成開始: {}", input);
-
         Contract contract = new Contract();
+    
         contract.setContractId(input.contractId != null ? input.contractId : UUID.randomUUID());
         contract.setCustomerId(input.customerId);
         contract.setProductId(input.productId);
         contract.setPrice(input.price);
         contract.setQuantity(input.quantity);
         contract.setCancelFlg(input.cancelFlg);
-
-        LocalDateTime createDate = null;
-        LocalDateTime updateDate = null;
+    
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+    
         try {
-            createDate = LocalDateTime.parse(input.createDate);
-        } catch (DateTimeParseException | NullPointerException e) {
-            createDate = LocalDateTime.now(); // フォーマット異常なら現在日時をセット
+            contract.setCreateDate(input.createDate != null
+                    ? LocalDateTime.parse(input.createDate, formatter)
+                    : LocalDateTime.now());
+        } catch (DateTimeParseException e) {
+            log.warn("createDateの形式が不正です: {}", input.createDate, e);
+            contract.setCreateDate(LocalDateTime.now());
         }
+    
         try {
-            updateDate = LocalDateTime.parse(input.updateDate);
-        } catch (DateTimeParseException | NullPointerException e) {
-            updateDate = LocalDateTime.now();
+            contract.setUpdateDate(input.updateDate != null
+                    ? LocalDateTime.parse(input.updateDate, formatter)
+                    : LocalDateTime.now());
+        } catch (DateTimeParseException e) {
+            log.warn("updateDateの形式が不正です: {}", input.updateDate, e);
+            contract.setUpdateDate(LocalDateTime.now());
         }
+    
+        return io.quarkus.hibernate.reactive.panache.Panache.withTransaction(() -> repository.persist(contract))
+            .replaceWith(contract)
+            .onFailure().invoke(ex -> log.error("契約作成中にエラー発生", ex));
+      }
 
-        contract.setCreateDate(createDate);
-        contract.setUpdateDate(updateDate);
-
-        return repository.persist(contract)
-            .onFailure().invoke(ex -> log.error("契約作成中にエラー: {}", ex.getMessage()))
-            .replaceWith(contract);
-    }
     // DTO
     public static class ContractInput {
         public UUID contractId;
@@ -72,7 +74,7 @@ public class ContractGraphQLResource {
         public BigDecimal price;
         public int quantity;
         public String cancelFlg;
-        public String createDate;
+        public String createDate;  // ISO形式の文字列
         public String updateDate;
 
         @Override
@@ -84,8 +86,8 @@ public class ContractGraphQLResource {
                     ", price=" + price +
                     ", quantity=" + quantity +
                     ", cancelFlg='" + cancelFlg + '\'' +
-                    ", createDate=" + createDate +
-                    ", updateDate=" + updateDate +
+                    ", createDate='" + createDate + '\'' +
+                    ", updateDate='" + updateDate + '\'' +
                     '}';
         }
     }

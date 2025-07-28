@@ -19,24 +19,8 @@
             name: Content-Type
             constant: application/json
 
-        - set-body:
-            simple: >
-              {
-                "query": "mutation {
-                  createContract(contractInput: {
-                    contractId: \"${body[contractId]}\",
-                    customerId: \"${body[customerId]}\",
-                    productId: \"${body[productId]}\",
-                    price: ${body[price]},
-                    quantity: ${body[quantity]},
-                    cancelFlg: \"${body[cancelFlg]}\",
-                    createDate: \"${body[createDate]}\",
-                    updateDate: \"${body[updateDate]}\"
-                  }) {
-                    contractId
-                  }
-                }"
-              }
+        - process:
+            ref: "#class:com.example.ContractGraphQLRequestProcessor"
 
         - log:
             message: "GraphQL Request Body: ${body}"

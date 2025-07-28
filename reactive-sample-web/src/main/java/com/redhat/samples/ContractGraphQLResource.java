@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
+import java.time.LocalDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,8 +53,8 @@ public class ContractGraphQLResource {
         public BigDecimal price;
         public int quantity;
         public String cancelFlg;
-        public Timestamp createDate;
-        public Timestamp updateDate;
+        public LocalDateTime createDate;
+        public LocalDateTime updateDate;
 
         @Override
         public String toString() {

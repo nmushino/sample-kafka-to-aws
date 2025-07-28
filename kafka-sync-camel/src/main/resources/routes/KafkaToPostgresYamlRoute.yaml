@@ -1,3 +1,13 @@
+- on-exception:
+    exception:
+      - java.lang.Exception
+    handled:
+      constant: true
+    steps:
+      - log:
+          message: "Exception occurred: ${exception.message}"
+          loggingLevel: ERROR
+          
 - route:
     id: route-graphql-contract
     from:
@@ -27,13 +37,3 @@
             loggingLevel: DEBUG
 
         - to: http://reactivesample-sample-demo.apps.tggus-demo2.j526.p1.openshiftapps.com/graphql
-
-- on-exception:
-    exception:
-      - java.lang.Exception
-    handled:
-      constant: true
-    steps:
-      - log:
-          message: "Exception occurred: ${exception.message}"
-          loggingLevel: ERROR

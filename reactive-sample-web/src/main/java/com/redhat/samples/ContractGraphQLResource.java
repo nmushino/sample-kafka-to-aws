@@ -9,10 +9,14 @@ import java.util.List;
 import java.util.UUID;
 import java.time.LocalDateTime;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @GraphQLApi
+@ApplicationScoped
 public class ContractGraphQLResource {
 
     private static final Logger log = LoggerFactory.getLogger(ContractGraphQLResource.class);
@@ -26,6 +30,7 @@ public class ContractGraphQLResource {
         return repository.listAll();
     }
 
+    @Transactional
     @Mutation("createContract")
     public Uni<Contract> createContract(@Name("contractInput") ContractInput input) {
         log.info("契約作成開始: {}", input);

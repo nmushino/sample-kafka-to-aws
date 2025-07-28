@@ -1,42 +1,120 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>Contracts</title>
+<meta charset="UTF-8" />
+<title>契約一覧</title>
+<style>
+  body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f8;
+    padding: 2rem;
+    color: #333;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  thead {
+    background-color: #666666; /* ダークグレー */
+    color: white;
+  }
+  thead th {
+    padding: 12px 15px;
+    text-align: left;
+  }
+  tbody tr {
+    border-bottom: 1px solid #ddd;
+  }
+  tbody tr:nth-child(even) {
+    background-color: #f9fafb;
+  }
+  tbody td {
+    padding: 12px 15px;
+  }
+  tbody tr:hover {
+    background-color: #e6f7ff;
+  }
+</style>
 </head>
 <body>
-  <h1>Contracts</h1>
-  <ul id="contracts"></ul>
+  <h1>Debeziumで連携された契約一覧</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>契約ID</th>
+        <th>顧客ID</th>
+        <th>商品ID</th>
+        <th>価格 (円)</th>
+        <th>数量</th>
+        <th>キャンセルフラグ</th>
+        <th>作成日時</th>
+        <th>更新日時</th>
+      </tr>
+    </thead>
+    <tbody id="contracts-body">
+      <!-- ここにデータ行が入る -->
+    </tbody>
+  </table>
 
-  <script>
-    async function fetchContracts() {
-      const response = await fetch('/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: `
-            query {
-              contracts {
-                id
-                productId
-                customerId
-                price
-              }
+<script>
+  async function fetchContracts() {
+    const response = await fetch('/graphql', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: `
+          query {
+            allContracts {
+              contractId
+              customerId
+              productId
+              price
+              quantity
+              cancelFlg
+              createDate
+              updateDate
             }
-          `
-        })
-      });
-      const result = await response.json();
-      const list = document.getElementById('contracts');
-      list.innerHTML = '';
-      result.data.contracts.forEach(c => {
-        const li = document.createElement('li');
-        li.textContent = `${c.productId} - ${c.price}円`;
-        list.appendChild(li);
-      });
+          }
+        `
+      })
+    });
+
+    const result = await response.json();
+
+    if (result.errors) {
+      console.error('GraphQL Errors:', result.errors);
+      return;
     }
 
-    fetchContracts();
-  </script>
+    const tbody = document.getElementById('contracts-body');
+    tbody.innerHTML = '';
+
+    result.data.allContracts.forEach(c => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${c.contractId}</td>
+        <td>${c.customerId}</td>
+        <td>${c.productId}</td>
+        <td>${c.price.toLocaleString()}</td>
+        <td>${c.quantity}</td>
+        <td>${c.cancelFlg}</td>
+        <td>${new Date(c.createDate).toLocaleString()}</td>
+        <td>${new Date(c.updateDate).toLocaleString()}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  fetchContracts();
+</script>
 </body>
 </html>

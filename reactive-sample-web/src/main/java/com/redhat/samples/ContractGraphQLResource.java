@@ -2,6 +2,8 @@ package com.redhat.samples;
 
 import io.smallrye.mutiny.Uni;
 import io.smallrye.mutiny.infrastructure.Infrastructure;
+import io.quarkus.hibernate.reactive.panache.common.WithSession;
+import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.graphql.*;
 import java.math.BigDecimal;
@@ -25,9 +27,11 @@ public class ContractGraphQLResource {
     @Inject
     ContractRepository repository;
 
+    
     @Query("allContracts")
+    @WithSession
     public Uni<List<Contract>> getAllContracts() {
-        return repository.findAll().list(); // 修正: collect() → list()
+        return repository.findAll().list();
     }
 
     @Mutation("createContract")

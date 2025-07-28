@@ -42,8 +42,8 @@ public class ContractGraphQLRequestProcessor implements Processor {
 
         // GraphQLリクエストJSON文字列
         String graphql = String.format(
-            "{\"query\": \"mutation { createContract(contractInput: { contractId: \\\"%s\\\", customerId: \\\"%s\\\", productId: \\\"%s\\\", price: %s, quantity: %d, cancelFlg: \\\"%s\\\", createDate: \\\"%s\\\", updateDate: \\\"%s\\\" }) { contractId } }\"}",
-            contractId, customerId, productId, price.toPlainString(), quantity, cancelFlg, now, now);
+        "{\"query\": \"mutation { createContract(contractInput: { contractId: \\\"%s\\\", customerId: \\\"%s\\\", productId: \\\"%s\\\", price: %s, quantity: %d, cancelFlg: \\\"%s\\\", createDate: \\\"%s\\\", updateDate: \\\"%s\\\" }) { contractId } }\"}",
+        contractId, customerId, productId, price.toPlainString(), quantity, cancelFlg, now, now);
 
         exchange.getIn().setBody(graphql);
         exchange.getIn().setHeader("Content-Type", "application/json");

@@ -51,6 +51,8 @@ public class ContractGraphQLResource {
         public java.math.BigDecimal price;
         public int quantity;
         public String cancelFlg;
+        public LocalDateTime createDate;
+        public LocalDateTime updateDate;
 
         @Override
         public String toString() {
@@ -60,6 +62,8 @@ public class ContractGraphQLResource {
                     ", price=" + price +
                     ", quantity=" + quantity +
                     ", cancelFlg='" + cancelFlg + '\'' +
+                    ", createDate='" + createDate + '\'' +
+                    ", updateDate='" + updateDate + '\'' +
                     '}';
         }
     }

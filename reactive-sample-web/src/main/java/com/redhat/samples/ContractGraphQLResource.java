@@ -3,12 +3,8 @@ package com.redhat.samples;
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.graphql.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,8 +40,8 @@ public class ContractGraphQLResource {
         contract.setUpdateDate(input.updateDate);
 
         return repository.persist(contract)
-          .onFailure().invoke(ex -> log.error("契約作成中にエラー: {}", ex.getMessage()))
-          .replaceWith(contract);
+            .onFailure().invoke(ex -> log.error("契約作成中にエラー: {}", ex.getMessage()))
+            .replaceWith(contract);
     }
 
     // DTO
@@ -63,13 +59,13 @@ public class ContractGraphQLResource {
         public String toString() {
             return "ContractInput{" +
                     "contractId=" + contractId +
-                    "customerId=" + customerId +
+                    ", customerId=" + customerId +
                     ", productId='" + productId + '\'' +
                     ", price=" + price +
                     ", quantity=" + quantity +
                     ", cancelFlg='" + cancelFlg + '\'' +
-                    ", createDate='" + createDate + '\'' +
-                    ", updateDate='" + updateDate + '\'' +
+                    ", createDate=" + createDate +
+                    ", updateDate=" + updateDate +
                     '}';
         }
     }

@@ -8,19 +8,27 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @GraphQLApi
 public class ContractGraphQLResource {
+
+    private static final Logger log = LoggerFactory.getLogger(ContractGraphQLResource.class);
 
     @Inject
     ContractRepository repository;
 
     @Query("allContracts")
     public Uni<List<Contract>> getAllContracts() {
+        log.info("全契約を取得します");
         return repository.listAll();
     }
 
     @Mutation("createContract")
     public Uni<Contract> createContract(@Name("contractInput") ContractInput input) {
+        log.info("契約作成開始: {}", input);
+
         Contract contract = new Contract();
         contract.setContractId(UUID.randomUUID());
         contract.setCustomerId(input.customerId);
@@ -31,19 +39,27 @@ public class ContractGraphQLResource {
         contract.setCreateDate(LocalDateTime.now());
         contract.setUpdateDate(LocalDateTime.now());
 
-        // DB保存後にバックログ処理を非同期で呼び出す
-        return repository.persist(contract)
-            .flatMap(voidRes -> contractLogService.logContractCreationAsync(contract))
-            .replaceWith(contract);
+        return repository.persist(contract).replaceWith(contract);
     }
 
-    // 入力用 DTO
+    // DTO
     public static class ContractInput {
         public UUID customerId;
         public String productId;
         public java.math.BigDecimal price;
         public int quantity;
         public String cancelFlg;
+
+        @Override
+        public String toString() {
+            return "ContractInput{" +
+                    "customerId=" + customerId +
+                    ", productId='" + productId + '\'' +
+                    ", price=" + price +
+                    ", quantity=" + quantity +
+                    ", cancelFlg='" + cancelFlg + '\'' +
+                    '}';
+        }
     }
 }
 

@@ -65,56 +65,65 @@
     </tbody>
   </table>
 
-<script>
-  async function fetchContracts() {
-    const response = await fetch('/graphql', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query: `
-          query {
-            allContracts {
-              contractId
-              customerId
-              productId
-              price
-              quantity
-              cancelFlg
-              createDate
-              updateDate
-            }
-          }
-        `
-      })
-    });
-
-    const result = await response.json();
-
-    if (result.errors) {
-      console.error('GraphQL Errors:', result.errors);
-      return;
+  <script>
+    async function fetchContracts() {
+      try {
+        const response = await fetch('/graphql', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: `
+              query {
+                allContracts {
+                  contractId
+                  customerId
+                  productId
+                  price
+                  quantity
+                  cancelFlg
+                  createDate
+                  updateDate
+                }
+              }
+            `
+          })
+        });
+  
+        const result = await response.json();
+  
+        if (result.errors) {
+          console.error('GraphQL Errors:', result.errors);
+          return;
+        }
+  
+        const tbody = document.getElementById('contracts-body');
+        tbody.innerHTML = '';
+  
+        result.data.allContracts.forEach(c => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${c.contractId}</td>
+            <td>${c.customerId}</td>
+            <td>${c.productId}</td>
+            <td>${Number(c.price).toLocaleString()}</td>
+            <td>${c.quantity}</td>
+            <td>${c.cancelFlg}</td>
+            <td>${new Date(c.createDate).toLocaleString()}</td>
+            <td>${new Date(c.updateDate).toLocaleString()}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+  
+      } catch (err) {
+        console.error('データ取得エラー:', err);
+      }
     }
-
-    const tbody = document.getElementById('contracts-body');
-    tbody.innerHTML = '';
-
-    result.data.allContracts.forEach(c => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${c.contractId}</td>
-        <td>${c.customerId}</td>
-        <td>${c.productId}</td>
-        <td>${c.price.toLocaleString()}</td>
-        <td>${c.quantity}</td>
-        <td>${c.cancelFlg}</td>
-        <td>${new Date(c.createDate).toLocaleString()}</td>
-        <td>${new Date(c.updateDate).toLocaleString()}</td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
-
-  fetchContracts();
-</script>
+  
+    // 初回取得
+    fetchContracts();
+  
+    // 5秒ごとにデータを更新
+    setInterval(fetchContracts, 2000);
+  </script>
 </body>
 </html>

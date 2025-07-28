@@ -23,7 +23,7 @@
             simple: >
               {
                 "query": "mutation {
-                  createContract(input: {
+                  createContract(contractInput: {
                     contractId: \"${body[contractId]}\",
                     customerId: \"${body[customerId]}\",
                     productId: \"${body[productId]}\",
@@ -37,6 +37,7 @@
                   }
                 }"
               }
+
         - log:
             message: "GraphQL Request Body: ${body}"
             loggingLevel: DEBUG

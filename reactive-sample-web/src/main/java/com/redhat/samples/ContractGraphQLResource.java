@@ -31,7 +31,10 @@ public class ContractGraphQLResource {
         contract.setCreateDate(LocalDateTime.now());
         contract.setUpdateDate(LocalDateTime.now());
 
-        return repository.persist(contract).replaceWith(contract);
+        // DB保存後にバックログ処理を非同期で呼び出す
+        return repository.persist(contract)
+            .flatMap(voidRes -> contractLogService.logContractCreationAsync(contract))
+            .replaceWith(contract);
     }
 
     // 入力用 DTO

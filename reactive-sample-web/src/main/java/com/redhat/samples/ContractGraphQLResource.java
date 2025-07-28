@@ -5,6 +5,8 @@ import jakarta.inject.Inject;
 import org.eclipse.microprofile.graphql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,36 +34,42 @@ public class ContractGraphQLResource {
         log.info("契約作成開始: {}", input);
 
         Contract contract = new Contract();
-        contract.setContractId(UUID.randomUUID());
+        contract.setContractId(input.contractId);
         contract.setCustomerId(input.customerId);
         contract.setProductId(input.productId);
         contract.setPrice(input.price);
         contract.setQuantity(input.quantity);
         contract.setCancelFlg(input.cancelFlg);
-        
-        LocalDateTime now = LocalDateTime.now();
-        contract.setCreateDate(now);
-        contract.setUpdateDate(now);
+        contract.setCreateDate(input.createDate);
+        contract.setUpdateDate(input.updateDate);
 
-        return repository.persist(contract).replaceWith(contract);
+        return repository.persist(contract)
+          .onFailure().invoke(ex -> log.error("契約作成中にエラー: {}", ex.getMessage()))
+          .replaceWith(contract);
     }
 
     // DTO
     public static class ContractInput {
+        public UUID contractId;
         public UUID customerId;
         public String productId;
-        public java.math.BigDecimal price;
+        public BigDecimal price;
         public int quantity;
         public String cancelFlg;
+        public Timestamp createDate;
+        public Timestamp updateDate;
 
         @Override
         public String toString() {
             return "ContractInput{" +
+                    "contractId=" + contractId +
                     "customerId=" + customerId +
                     ", productId='" + productId + '\'' +
                     ", price=" + price +
                     ", quantity=" + quantity +
                     ", cancelFlg='" + cancelFlg + '\'' +
+                    ", createDate='" + createDate + '\'' +
+                    ", updateDate='" + updateDate + '\'' +
                     '}';
         }
     }

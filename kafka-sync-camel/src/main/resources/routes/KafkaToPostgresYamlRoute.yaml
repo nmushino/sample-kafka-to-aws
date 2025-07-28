@@ -7,6 +7,15 @@
             message: "Kafka Message Received: ${body}"
             loggingLevel: INFO
 
+        - on-exception:
+            exception:
+            - java.lang.Exception
+            handled: true
+            steps:
+            - log:
+                message: "Exception occurred: ${exception.message}"
+                loggingLevel: ERROR
+                
         - unmarshal:
             json:
               library: jackson

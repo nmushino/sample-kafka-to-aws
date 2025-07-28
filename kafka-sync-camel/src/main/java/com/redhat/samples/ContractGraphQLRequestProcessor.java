@@ -5,12 +5,17 @@ import org.apache.camel.Processor;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Random;
 
 public class ContractGraphQLRequestProcessor implements Processor {
 
     private final Random random = new Random();
+
+    // ISO8601形式のフォーマッターを定義
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     @Override
     public void process(Exchange exchange) throws Exception {
@@ -42,5 +47,5 @@ public class ContractGraphQLRequestProcessor implements Processor {
 
         exchange.getIn().setBody(graphql);
         exchange.getIn().setHeader("Content-Type", "application/json");
-        }
+    }
 }
